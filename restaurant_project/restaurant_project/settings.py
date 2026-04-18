@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'restaurant.apps.RestaurantConfig',
     'ckeditor',
     'ckeditor_uploader',
+    'rest_framework',
 ]
 
 CKEDITOR_UPLOAD_PATH = "images/ckeditors/"
@@ -100,6 +101,9 @@ cloudinary.config(
     api_key="741292862314714",
     api_secret="W2ZRuCS-79Rf5FY9H3cu5qUUDYQ"
 )
+
+import pymysql
+pymysql.install_as_MySQLdb()
 
 AUTH_PASSWORD_VALIDATORS = [
     {

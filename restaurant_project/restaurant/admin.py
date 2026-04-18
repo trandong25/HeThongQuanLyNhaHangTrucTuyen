@@ -1,3 +1,97 @@
 from django.contrib import admin
+from django.db.models import Count
+from django.template.response import TemplateResponse
+from django.urls import path
+from restaurant.models import Category, Dish, User, Ingredient, Order, Review, Table, Transaction, ChatSession, \
+    OrderDetail, Reservation
+from django import forms
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from django.utils.html import mark_safe
+from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
+from django.contrib import messages
 
-# Register your models here.
+
+class DishForm(forms.ModelForm):
+    def __init__(self,*arg, **kwargs):
+        super().__init__(*arg,**kwargs)
+        self.fields['description'].required = False
+
+class DishAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'price', 'category', 'prep_time', 'active', 'image_preview']
+    search_fields = ['name']
+    list_filter = ['category','active']
+    readonly_fields = ['image_preview']
+    filter_horizontal = ('ingredients',)
+
+    def image_preview(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" width="100" style="border-radius: 5px;" />')
+        return "Chưa có ảnh"
+
+    image_preview.short_description = 'Hình ảnh'
+
+class OrderDetailInline(admin.TabularInline):
+    model = OrderDetail
+    extra = 0
+
+class TransactionInline(admin.TabularInline):
+    model = Transaction
+    extra = 0
+
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ['id', 'customer', 'status', 'total_amount', 'created_date']
+    list_filter = ['status']
+    search_fields = ['customer__username']
+    inlines = [OrderDetailInline, TransactionInline]
+
+class ReservationAdmin(admin.ModelAdmin):
+    list_display = ['id', 'customer', 'table', 'reservation_time', 'number_of_people', 'status']
+    list_filter = ['status', 'reservation_time']
+    search_fields = ['customer__username', 'table__table_number']
+
+
+class CustomUserAdmin(DefaultUserAdmin):
+    list_display = ['username', 'email', 'first_name', 'last_name', 'role', 'is_approved']
+    list_filter = ['role', 'is_approved', 'is_staff', 'is_active']
+    fieldsets = DefaultUserAdmin.fieldsets + (
+        ('Thông tin Nhà hàng', {'fields': ('role', 'is_approved', 'phone_number', 'avatar')}),
+    )
+    actions = ['approve_chefs']
+
+    def approve_chefs(self, request, queryset):
+        chefs_to_approve = queryset.filter(role='CHEF', is_approved=False)
+        count = chefs_to_approve.update(is_approved=True)
+        self.message_user(request, f'Đã duyệt thành công {count} tài khoản Đầu bếp.', level=messages.SUCCESS)
+
+    approve_chefs.short_description = "Duyệt đầu bếp"
+
+class MyAdminSite(admin.AdminSite):
+    site_header = 'Hệ thống quản lý bán hàng'
+    site_title = 'Trang quản trị'
+    index_title = 'Bảng điều khiển'
+
+    def get_urls(self):
+        return [
+            path('restaurant-stats/', self.restaurant_stats),
+        ]+super().get_urls()
+
+    def restaurant_stats(self,request):
+        stats = Category.objects.annotate(c=Count('dishes')).values('id', 'name', 'c')
+        return TemplateResponse(request, 'admin/stats.html', {
+            'stats': stats
+        })
+    
+
+admin_site = MyAdminSite()
+
+admin_site.register(Dish, DishAdmin)
+admin_site.register(Order, OrderAdmin)
+admin_site.register(Reservation, ReservationAdmin)
+
+admin_site.register(User, CustomUserAdmin)
+admin_site.register(Category)
+admin_site.register(Ingredient)
+admin_site.register(Review)
+admin_site.register(Table)
+admin_site.register(Transaction)
+admin_site.register(ChatSession)

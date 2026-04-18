@@ -18,8 +18,10 @@ import ckeditor_uploader
 from django.contrib import admin
 from django.urls import path, re_path, include
 
+from restaurant.admin import admin_site
+
 urlpatterns = [
     path('', include('restaurant.urls')),
-    path('admin/', admin.site.urls),
+    path('admin/', admin_site.urls),
     re_path(r'^ckeditor/', include('ckeditor_uploader.urls')),
 ]

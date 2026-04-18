@@ -1,6 +1,13 @@
-from django.urls import path
-# from restaurant import views
+from django.urls import path,include
+from rest_framework.routers import DefaultRouter
+from . import views
+
+router = DefaultRouter()
+router.register('categories', views.CategoryViewSet, basename='category')
+router.register('dishes', views.DishViewSet,basename='dish')
+
+
 
 urlpatterns = [
-    # path('', include(route.urls))
+    path('', include(router.urls))
 ]
