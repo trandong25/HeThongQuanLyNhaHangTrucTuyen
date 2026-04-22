@@ -13,11 +13,11 @@ class DishSerializer(serializers.ModelSerializer):
         model = Dish
         fields = ['id', 'name', 'price', 'category', 'prep_time', 'image', 'ingredients']
 
-        def to_representation(self, instance):
-            data = super().to_representation(instance)
-            if instance.image:
-                data['image'] = instance.image.url
-            return data
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.image:
+            data['image'] = instance.image.url
+        return data
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

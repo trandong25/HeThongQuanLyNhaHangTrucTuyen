@@ -3,8 +3,8 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register('categories', views.CategoryViewSet, basename='category')
-router.register('dishes', views.DishViewSet,basename='dish')
+router.register('categories', views.CategoryViewSet, basename='categories')
+router.register('dishes', views.DishViewSet,basename='dishes')
 
 
 

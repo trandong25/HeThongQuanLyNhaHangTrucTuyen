@@ -41,9 +41,20 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'rest_framework',
+    'drf_yasg',
+    'oauth2_provider',
+
 ]
 
 CKEDITOR_UPLOAD_PATH = "images/ckeditors/"
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 2,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    )
+}
 
 MIDDLEWARE = [
 
@@ -93,7 +104,6 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'restaurant.User'
 
-
 import cloudinary.api
 
 cloudinary.config(
@@ -103,6 +113,7 @@ cloudinary.config(
 )
 
 import pymysql
+
 pymysql.install_as_MySQLdb()
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -137,5 +148,3 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
