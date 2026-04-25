@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'oauth2_provider',
-
 ]
 
 CKEDITOR_UPLOAD_PATH = "images/ckeditors/"
@@ -148,3 +147,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CLIENT_ID = 'KUVgaZxDGr7orjTq9tBZS1ZFtjEBaAD13uuWGx3V'
+CLIENT_SECRET = 'AtjIPB0lIVJ2sDLy8W668bFy9YbsKYAHWOKA3g6d1xpMFSa82NiZDYiK3SPrXzmlDEvTtVuzcYMFg5qSXMq7pE4gmFG2CYE0OAFR2KaNgs1W9OUN4OqxLYVOM5odQ0Gw'
