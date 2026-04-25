@@ -18,6 +18,8 @@ import ckeditor_uploader
 from django.contrib import admin
 from django.urls import path, re_path, include
 from drf_yasg.views import get_schema_view
+
+from restaurant import views
 from restaurant.admin import admin_site
 from rest_framework import permissions
 from drf_yasg import openapi
@@ -42,6 +44,7 @@ urlpatterns = [
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0),
             name='schema-json'),
+    path('webhook/payment/', views.PaymentWebhookView.as_view(), name='payment-webhook'),
     re_path(r'^swagger/$',
             schema_view.with_ui('swagger', cache_timeout=0),
             name='schema-swagger-ui'),

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import User,Category,Dish,Review,Ingredient
-from .models import Table,Reservation
+from .models import Table,Reservation, OrderDetail, Order
 
 
 
@@ -81,5 +81,50 @@ class ReservationSerializer(serializers.ModelSerializer):
             'customer': {'read_only':True},
             'status' : {'read_only':True},
             'table': {'write_only': True}
-
         }
+
+class OrderDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderDetail
+        fields = ['id', 'dish', 'quantity', 'unit_price']
+        extra_kwargs = {
+            'unit_price': {'read_only':True}
+        }
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_details = OrderDetailSerializer(many = True, write_only=True)
+
+    class Meta:
+        model = Order
+        fields = ['id','customer','status','total_amount','created_date','order_details']
+        extra_kwargs = {
+            'customer': {'read_only': True},
+            'status': {'read_only': True},
+            'total_amount': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        #validate_data từ is_valid(), pop để lấy dữ liêu detail ra và xóa cột đó trong validated
+        details_data = validated_data.pop('order_details')
+
+        #request = self.context.get('request'), request.user
+        user = self.context['request'].user
+        order = Order.objects.create(customer=user, **validated_data)
+
+        total = 0
+        for detail in details_data:
+            dish = detail['dish']
+            quantity = detail['quantity']
+            unit_price = dish.price
+            total += unit_price*quantity
+
+            OrderDetail.objects.create(
+                order=order,
+                dish =dish,
+                quantity = quantity,
+                unit_price = unit_price
+            )
+        order.total_amount = total
+        order.save()
+
+        return order

@@ -3,9 +3,12 @@ from django.contrib.admindocs.utils import parse_rst
 from rest_framework.decorators import action, permission_classes
 from django.core.serializers import serialize
 from rest_framework import viewsets, generics, permissions,status, parsers,filters
-from .models import Category, Dish, User, Review,Reservation
+from .models import Category, Dish, User, Review,Reservation, Order,Transaction
 from restaurant import serializers, paginators,perms
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
@@ -88,3 +91,67 @@ class ReservationViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAP
 
     def perform_create(self, serializer):
         serializer.save(customer=self.request.user)
+
+class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView):
+    serializer_class =  serializers.OrderSerializer
+    permission_classes =  [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return  Order.objects.filter(customer = self.request.user).order_by('-created_date')
+
+    @action(methods=['post'], detail=True, url_path='pay')
+    def pay(self, request,pk):
+        order = self.get_object()
+        method = request.data.get('payment_method', 'CASH').upper()
+
+        if order.transactions.filter(status = 'SUCCESS').exists():
+            return Response({"error":"Đơn hàng này đã được thanh toán thành công trước đó"},status=status.HTTP_400_BAD_REQUEST)
+
+        transaction = Transaction.objects.create(
+            order=order,
+            amount = order.total_amount,
+            payment_method = method
+        )
+        if method == 'CASH':
+            transaction.status = 'PENDING'
+            transaction.save()
+            return Response({
+                "message": "Vui lòng thanh toán tiền mặt tại quầy",
+                "transaction_id": transaction.id,
+                "status": transaction.status
+            }, status = status.HTTP_200_OK)
+        elif method in ['MOMO', 'ZALOPAY', 'STRIPE', 'PAYPAL']:
+            mock_payment_url = f"https://sandbox.payment-gateway.com/checkout?method={method}&amount={transaction.amount}&txnRef={transaction.id}"
+            return Response({
+                "message": f"Vui lòng truy cập đường dẫn để thanh toán qua {method}",
+                "payment_url": mock_payment_url,
+                "transaction_id": transaction.id,
+                "status": transaction.status  # Vẫn đang là PENDING
+            }, status=status.HTTP_200_OK)
+        return Response({"error": "Phương thức thanh toán không hỗ trợ"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PaymentWebhookView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        txn_id = request.data.get('transaction_id')
+        gateway_status = request.data.get('status')
+        txn_code = request.data.get('gateway_code')
+
+        try:
+            transaction = Transaction.objects.get(pk=txn_id)
+
+            if gateway_status == 'SUCCESS':
+                transaction.status = 'SUCCESS'
+                transaction.transaction_code = txn_code
+                transaction.save()
+
+                return Response({"message": "Đã ghi nhận thanh toán thành công"}, status=status.HTTP_200_OK)
+            else:
+                transaction.status = 'FAILED'
+                transaction.save()
+                return Response({"message": "Giao dịch thất bại"}, status=status.HTTP_200_OK)
+        #Transaction
+        except ObjectDoesNotExist:
+            return Response({"error": "Không tìm thấy giao dịch"}, status=status.HTTP_404_NOT_FOUND)
