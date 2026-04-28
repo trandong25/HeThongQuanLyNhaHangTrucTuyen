@@ -36,6 +36,7 @@ class Ingredient(BaseModel):
         return self.name
 
 class Dish(BaseModel):
+    chef = models.ForeignKey(User,on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = RichTextField()
     image = CloudinaryField()
@@ -43,7 +44,6 @@ class Dish(BaseModel):
     ingredients = models.ManyToManyField(Ingredient,related_name='dishes')
     prep_time = models.IntegerField(help_text="Thời gian chuẩn bị (phút)")
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,null=True, related_name='dishes')
-
     class Meta:
         unique_together = ('name', 'category')
 
@@ -55,6 +55,7 @@ class Review(BaseModel):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.DecimalField(max_digits=2, decimal_places=1, default=5.0)
     comment = models.TextField()
+    created_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('dish','customer')
@@ -107,6 +108,8 @@ class OrderDetail(models.Model):
     dish = models.ForeignKey(Dish, on_delete=models.PROTECT)
     quantity = models.IntegerField()
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    def __str__(self):
+        return f"{self.dish.name} - {self.quantity}"
 
 class Transaction(BaseModel):
     PAYMENT_METHODS = [
@@ -126,9 +129,11 @@ class Transaction(BaseModel):
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHODS)
     status = models.CharField(max_length=10, choices=TRANSACTION_STATUS, default='PENDING')
     transaction_code = models.CharField(max_length=100, null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Giao dịch #{self.id} - {self.amount} ({self.get_status_display()})"
+
 
 class ChatSession(BaseModel):
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_chats')

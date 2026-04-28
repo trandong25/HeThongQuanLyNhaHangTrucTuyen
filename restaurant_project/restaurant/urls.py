@@ -5,6 +5,11 @@ from . import views
 router = DefaultRouter()
 router.register('categories', views.CategoryViewSet, basename='categories')
 router.register('dishes', views.DishViewSet,basename='dishes')
+router.register('reviews', views.ReviewViewSet)
+router.register('order', views.OrderViewSet)
+router.register('transactions', views.TransactionViewSet)
+router.register('stats', views.StatsViewSet,basename='stats')
+router.register('compare', views.CompareDishViewSet,basename='compare')
 
 
 
