@@ -131,27 +131,28 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
         return Response({"error": "Phương thức thanh toán không hỗ trợ"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PaymentWebhookView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        txn_id = request.data.get('transaction_id')
-        gateway_status = request.data.get('status')
-        txn_code = request.data.get('gateway_code')
-
-        try:
-            transaction = Transaction.objects.get(pk=txn_id)
-
-            if gateway_status == 'SUCCESS':
-                transaction.status = 'SUCCESS'
-                transaction.transaction_code = txn_code
-                transaction.save()
-
-                return Response({"message": "Đã ghi nhận thanh toán thành công"}, status=status.HTTP_200_OK)
-            else:
-                transaction.status = 'FAILED'
-                transaction.save()
-                return Response({"message": "Giao dịch thất bại"}, status=status.HTTP_200_OK)
-        #Transaction
-        except ObjectDoesNotExist:
-            return Response({"error": "Không tìm thấy giao dịch"}, status=status.HTTP_404_NOT_FOUND)
+# class PaymentWebhookView(APIView):
+#     permission_classes = [AllowAny]
+#
+#     def post(self, request):
+#         txn_id = request.data.get('transaction_id')
+#         gateway_status = request.data.get('status')
+#         txn_code = request.data.get('gateway_code')
+#
+#         try:
+#             transaction = Transaction.objects.get(pk=txn_id)
+#
+#             if gateway_status == 'SUCCESS':
+#                 transaction.status = 'SUCCESS'
+#                 transaction.transaction_code = txn_code
+#                 transaction.save()
+#
+#                 return Response({"message": "Đã ghi nhận thanh toán thành công"}, status=status.HTTP_200_OK)
+#             else:
+#                 transaction.status = 'FAILED'
+#                 transaction.save()
+#                 return Response({"message": "Giao dịch thất bại"}, status=status.HTTP_200_OK)
+#         #Transaction
+#         except ObjectDoesNotExist:
+#             return Response({"error": "Không tìm thấy giao dịch"}, status=status.HTTP_404_NOT_FOUND)
+#

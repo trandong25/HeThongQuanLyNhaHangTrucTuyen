@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-w8j(np-om^a!u@tg)vfq&fpw7zu#1beycp#u=z&lw#p9ig*(f2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -150,6 +150,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CLIENT_ID = 'KUVgaZxDGr7orjTq9tBZS1ZFtjEBaAD13uuWGx3V'
 CLIENT_SECRET = 'AtjIPB0lIVJ2sDLy8W668bFy9YbsKYAHWOKA3g6d1xpMFSa82NiZDYiK3SPrXzmlDEvTtVuzcYMFg5qSXMq7pE4gmFG2CYE0OAFR2KaNgs1W9OUN4OqxLYVOM5odQ0Gw'
+
+
 
 
 #Setting Momo
