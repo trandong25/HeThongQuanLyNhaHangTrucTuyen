@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import User,Category,Dish,Review,Ingredient
+from .models import User,Category,Dish,Review,Ingredient,Transaction
 from .models import Table,Reservation, OrderDetail, Order
+from django.db.models import Avg
 
 
 
@@ -15,16 +16,12 @@ class IngredientSerializer(serializers.ModelSerializer):
         model = Ingredient
         fields = ['id', 'name']
 
-class DishSerializer(serializers.ModelSerializer):
-    ingredients = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Ingredient.objects.all()
-    )
-
+class CompareDishSerializer(serializers.ModelSerializer):
+    avg_rating = serializers.SerializerMethodField()
+    ingredients = serializers.SerializerMethodField()
     class Meta:
         model = Dish
-        fields = ['id', 'name', 'price', 'category', 'prep_time', 'image', 'ingredients']
-
+        fields = ['id', 'name', 'price', 'category', 'prep_time', 'image', 'ingredients', 'avg_rating']
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['ingredients'] = IngredientSerializer(instance.ingredients.all(), many=True).data
@@ -32,6 +29,10 @@ class DishSerializer(serializers.ModelSerializer):
         if instance.image:
             data['image'] = instance.image.url
         return data
+    def get_avg_rating(self, obj):
+        return round(obj.reviews.aggregate(avg=Avg('rating'))['avg'] or 0, 1)
+    def get_ingredients(self, obj):
+        return [i.name for i in obj.ingredients.all()]
 
 
 
@@ -64,6 +65,10 @@ class ReviewSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data['customer'] = UserSerializer(instance.customer).data
         return data
+    def  validate_rating(self, value):
+        if value < 1 or value > 5:
+            raise serializers.ValidationError("Rating must be between 1 and 5")
+        return value
 
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
@@ -128,3 +133,51 @@ class OrderSerializer(serializers.ModelSerializer):
         order.save()
 
         return order
+
+class DishSerializer(serializers.ModelSerializer):
+    ingredients = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Ingredient.objects.all()
+    )
+    chef = UserSerializer(read_only=True)
+    avg_rating = serializers.FloatField()
+    class Meta:
+        model = Dish
+        fields = [
+            'id', 'name', 'description', 'image',
+            'price', 'ingredients', 'prep_time',
+            'chef', 'category', 'avg_rating',
+            'created_date'
+        ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['ingredients'] = IngredientSerializer(instance.ingredients.all(), many=True).data
+
+        if instance.image:
+            data['image'] = instance.image.url
+        return data
+    
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = [
+            'id', 'order', 'amount',
+            'payment_method', 'status',
+            'transaction_code', 'created_date'
+        ]
+        read_only_fields = ['status', 'transaction_code']
+
+class DishSearchSerializer(serializers.ModelSerializer):
+    avg_rating = serializers.FloatField()
+    class Meta:
+        model = Dish
+        fields = [
+            'id', 'name', 'price',
+            'prep_time', 'avg_rating'
+        ]
+
+
+
+
+
