@@ -1,20 +1,53 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useReducer } from "react";
+
+import { NavigationContainer } from "@react-navigation/native";
+
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import Login from "./screens/User/Login";
+import Register from "./screens/User/Register";
+
+// Context
+import { MyUserContext } from "./configs/Contexts";
+
+// Reducer
+import { MyUserReducer } from "./reducers/reducers";
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+    // Global state
+    const [user, dispatch] = useReducer(
+        MyUserReducer,
+        null
+    );
+
+    return (
+
+        // Provider
+        <MyUserContext.Provider value={[user, dispatch]}>
+
+            <NavigationContainer>
+
+                <Stack.Navigator>
+
+                    <Stack.Screen
+                        name="Login"
+                        component={Login}
+                        options={{ headerShown: false }}
+                    />
+
+                    <Stack.Screen
+                        name="Register"
+                        component={Register}
+                        options={{ headerShown: false }}
+                    />
+
+                </Stack.Navigator>
+
+            </NavigationContainer>
+
+        </MyUserContext.Provider>
+    );
+}
