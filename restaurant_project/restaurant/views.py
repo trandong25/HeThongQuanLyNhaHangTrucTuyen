@@ -4,12 +4,17 @@ from django.contrib.admindocs.utils import parse_rst
 from rest_framework.decorators import action, permission_classes
 from django.core.serializers import serialize
 from rest_framework import viewsets, generics, permissions,status, parsers,filters
-from .models import Category, Dish, User, Review,Reservation, Order,Transaction
+from .models import Category, Dish, User, Review,Reservation, Order,Transaction, OrderDetail
 from restaurant import serializers, paginators,perms
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.functions import TruncDay
+from oauthlib.uri_validate import query
+from rest_framework.permissions import IsAuthenticated
+from .serializers import CompareDishSerializer
+from django.db.models import  Sum, Avg, F
 
 
 class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
@@ -17,27 +22,13 @@ class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
     serializer_class = serializers.CategorySerializer
 
 class DishViewSet(viewsets.ModelViewSet):
-    queryset = Dish.objects.prefetch_related('ingredients').filter(active=True)
+    queryset = Dish.objects.prefetch_related('ingredients').filter(active=True).annotate(avg_rating=Avg('reviews__rating'))
     serializer_class = serializers.DishSerializer
     pagination_class = paginators.DishPaginator
-    filter_backends = [DjangoFilterBackend,filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
-    ordering_fields = ['name','price', 'created_date','rating']
-    filterset_fields = ['category', 'prep_time', 'price']
-
-
-    def get_queryset(self):
-        queries = self.queryset
-
-        q = self.request.query_params.get("q")
-        if q:
-            queries = queries.filter(name__icontains=q)
-
-        cate_id = self.request.query_params.get("category_id")
-        if cate_id:
-            queries = queries.filter(category_id=cate_id)
-
-        return queries
+    filterset_fields = ['category', 'price', 'prep_time']
+    ordering_fields = ['name', 'price', 'created_date']
 
     def get_serializer_class(self):
         if self.action == 'reviews':
@@ -45,8 +36,6 @@ class DishViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [perms.IsApprovedChef()]
         if self.action == 'reviews' and self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
@@ -142,4 +131,99 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
                 "status": transaction.status  # Vẫn đang là PENDING
             }, status=status.HTTP_200_OK)
         return Response({"error": "Phương thức thanh toán không hỗ trợ"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(methods=['get'], detail=True)
+    def reviews(self, request, pk=None):
+        dish = self.get_object()
+        reviews = dish.reviews.all()
+        serializer = serializers.ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+    def get_queryset(self):
+        query= Dish.objects.filter(active=True).annotate(
+            avg_rating=Avg('reviews__rating')
+        )
+        q = self.request.query_params.get('q')
+        if q:
+            queryset = self.get_queryset()
+
+        category_id = self.request.query_params.get('category_id')
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+        min_price = self.request.query_params.get('min_price')
+        max_price = self.request.query_params.get('max_price')
+
+        if min_price:
+            queryset = queryset.filter(price__gte=min_price)
+        if max_price:
+            queryset = queryset.filter(price__lte=max_price)
+        prep_time = self.request.query_params.get('prep_time')
+        if prep_time:
+            queryset = queryset.filter(prep_time__gte=prep_time)
+        ordering = self.request.query_params.get('ordering')
+        if ordering:
+            queryset = queryset.order_by(ordering)
+
+        return queryset
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = serializers.ReviewSerializer
+    permission_classes = [IsAuthenticated]
+    def perform_create(self, serializer):
+        serializer.save(customer=self.request.user)
+
+
+class CompareDishViewSet(viewsets.ViewSet):
+    @action(methods=['get'], detail = False)
+    def compare(self, request):
+        ids = request.query_params.get('ids')
+
+        if not ids:
+            return Response({"error": "Vui lòng cung cấp ids"}, status=400)
+        try:
+            ids = [int(i) for i in ids.split(',')]
+        except ValueError:
+            return Response({"error": "ids phải là số"}, status=400)
+
+        dishes = Dish.objects.filter(id__in=ids)\
+            .annotate(avg_rating=Avg('reviews__rating'))
+
+        serializer = CompareDishSerializer(dishes, many=True)
+        return Response(serializer.data)
+
+class StatsViewSet(viewsets.ViewSet):
+    @action(methods=['get'], detail = False)
+    def dish_stats(self,request):
+        data = OrderDetail.objects.values('dish__name')\
+        .annotate(
+            total_quantity=Sum('quantity'),
+            revenue=Sum(F('quantity') * F('unit_price'))
+        ).order_by('-total_quantity')
+        return Response(data)
+
+    @action(detail=False, methods=['get'])
+    def chefs(self,request):
+        data = OrderDetail.objects.values('dish__chef__username')\
+            .annotate(
+                total_quantity=Sum('quantity'),
+                revenue=Sum(F('quantity') * F('unit_price'))
+        )
+        return Response(data)
+
+    @action(detail=False, methods=['get'])
+    def revenue_by_day(self,request):
+        data = OrderDetail.objects.annotate(
+            day = TruncDay('order__created_date')
+        ).values('day')\
+        .annotate(
+            revenue=Sum(F('quantity') * F('unit_price')),
+        ).order_by('day')
+        return Response(data)
+
+class TransactionViewSet(viewsets.ModelViewSet):
+    queryset = Transaction.objects.all()
+    serializer_class = serializers.TransactionSerializer
+    permission_classes = [IsAuthenticated]
 
