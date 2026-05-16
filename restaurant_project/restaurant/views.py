@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from django.contrib.admindocs.utils import parse_rst
 from rest_framework.decorators import action, permission_classes
@@ -19,9 +20,24 @@ class DishViewSet(viewsets.ModelViewSet):
     queryset = Dish.objects.prefetch_related('ingredients').filter(active=True)
     serializer_class = serializers.DishSerializer
     pagination_class = paginators.DishPaginator
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend,filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
-    ordering_fields = ['price', 'created_date']
+    ordering_fields = ['name','price', 'created_date','rating']
+    filterset_fields = ['category', 'prep_time', 'price']
+
+
+    def get_queryset(self):
+        queries = self.queryset
+
+        q = self.request.query_params.get("q")
+        if q:
+            queries = queries.filter(name__icontains=q)
+
+        cate_id = self.request.query_params.get("category_id")
+        if cate_id:
+            queries = queries.filter(category_id=cate_id)
+
+        return queries
 
     def get_serializer_class(self):
         if self.action == 'reviews':
@@ -29,16 +45,13 @@ class DishViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [perms.IsApprovedChef()]
         if self.action == 'reviews' and self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
 
-    # @swagger_auto_schema(
-    #     method='post',
-    #     operation_description="Thêm đánh giá cho món ăn",
-    #     request_body=serializers.ReviewSerializer,
-    #     responses={201: serializers.ReviewSerializer()}
-    # )
+
     @action(methods=['post','get'], url_path='reviews', detail=True)
     def reviews(self, request, pk):
         if request.method.__eq__('POST'):
@@ -130,29 +143,3 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
             }, status=status.HTTP_200_OK)
         return Response({"error": "Phương thức thanh toán không hỗ trợ"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-# class PaymentWebhookView(APIView):
-#     permission_classes = [AllowAny]
-#
-#     def post(self, request):
-#         txn_id = request.data.get('transaction_id')
-#         gateway_status = request.data.get('status')
-#         txn_code = request.data.get('gateway_code')
-#
-#         try:
-#             transaction = Transaction.objects.get(pk=txn_id)
-#
-#             if gateway_status == 'SUCCESS':
-#                 transaction.status = 'SUCCESS'
-#                 transaction.transaction_code = txn_code
-#                 transaction.save()
-#
-#                 return Response({"message": "Đã ghi nhận thanh toán thành công"}, status=status.HTTP_200_OK)
-#             else:
-#                 transaction.status = 'FAILED'
-#                 transaction.save()
-#                 return Response({"message": "Giao dịch thất bại"}, status=status.HTTP_200_OK)
-#         #Transaction
-#         except ObjectDoesNotExist:
-#             return Response({"error": "Không tìm thấy giao dịch"}, status=status.HTTP_404_NOT_FOUND)
-#
