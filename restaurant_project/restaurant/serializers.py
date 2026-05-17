@@ -10,7 +10,6 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
-
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient

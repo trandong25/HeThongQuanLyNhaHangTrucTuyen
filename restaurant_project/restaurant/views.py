@@ -1,7 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.utils import swagger_auto_schema
-from django.contrib.admindocs.utils import parse_rst
-from rest_framework.decorators import action, permission_classes
+from rest_framework.decorators import action
 from django.core.serializers import serialize
 from rest_framework import viewsets, generics, permissions,status, parsers,filters
 from .models import Category, Dish, User, Review,Reservation, Order,Transaction, OrderDetail
@@ -22,9 +20,10 @@ class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
     serializer_class = serializers.CategorySerializer
 
 class DishViewSet(viewsets.ModelViewSet):
-    queryset = Dish.objects.prefetch_related('ingredients').filter(active=True).annotate(avg_rating=Avg('reviews__rating'))
+    queryset = Dish.objects.prefetch_related('ingredients').filter(active=True)
     serializer_class = serializers.DishSerializer
     pagination_class = paginators.DishPaginator
+
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
     filterset_fields = ['category', 'price', 'prep_time']
@@ -36,10 +35,12 @@ class DishViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     def get_permissions(self):
-        if self.action == 'reviews' and self.request.method == 'POST':
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [perms.IsApprovedChef()]
+        elif self.action == 'reviews' and self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
 
+        return [permissions.AllowAny()]
 
     @action(methods=['post','get'], url_path='reviews', detail=True)
     def reviews(self, request, pk):

@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react"
 import { View,ScrollView,ActivityIndicator, TouchableOpacity, FlatList,Image } from "react-native";
-import APIs, { endpoints } from "../../configs/APIs";
+import APIs, { endpoints } from "../../configs/APIs.js";
 import { Chip, List, Searchbar } from "react-native-paper";
 import Styles from "../../styles/Styles";
 import FoodCard from "../../components/FoodCard";
@@ -86,7 +86,7 @@ const Home = () => {
     }
 
     return (
-        <View style={Styles.container}>
+        <View style={Styles.cont}>
            <View style={Styles.padding}>
                 <Searchbar value={q} onChangeText={setQ} placeholder="Tìm món ăn..." />
             </View>

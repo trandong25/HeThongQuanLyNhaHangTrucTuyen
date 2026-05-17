@@ -1,22 +1,17 @@
-import { View } from "react-native"
-import Header from "./components/Header"
-import Styles from "./styles/Styles";
+import { useContext, useReducer } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Icon } from 'react-native-paper';
 import Home from "./screens/Home/Home";
 import Search from "./screens/Search/Search";
 import Cart from "./screens/Cart/Cart";
 import Chat from "./screens/Chat/Chat";
 import Profile from "./screens/User/Profile";
 import Login from "./screens/User/Login";
-import { SafeAreaView } from "react-native";
-import { Icon, Provider as PaperProvider } from 'react-native-paper';
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { MyUserContext } from "./configs/Context";
-import { MyUserReducer } from "./reducers/UserReducer";
-import { useContext, useReducer } from "react";
 import Register from "./screens/User/Register";
-
+import { MyUserContext } from "./configs/Contexts";
+import { MyUserReducer } from "./configs/Contexts";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,37 +19,54 @@ const Tab = createBottomTabNavigator();
 const HomeStackNavigator = () =>{
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name = "index" component={Home}/>
+      <Stack.Screen name="index" component={Home}/>
+    </Stack.Navigator>
+  )
+}
+const AuthStackNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Register" component={Register} />
     </Stack.Navigator>
   )
 }
 
 const TabNavigator = () => {
   const [user, ] = useContext(MyUserContext);
+
   return (
     <Tab.Navigator screenOptions={{
       headerShown: false,
       tabBarActiveTintColor: '#E65100',
       tabBarInactiveTintColor: 'gray'
     }}>
-      <Tab.Screen name ="Trang chủ" component={HomeStackNavigator} options={{ tabBarIcon: ({color}) => <Icon source="home" size={26} color={color} />}}/>
-      <Tab.Screen name ="Tìm kiếm" component={Search} options={{ tabBarIcon: ({color}) => <Icon source="magnify" size={26} color={color}/>}}/>
-      <Tab.Screen name ="Giỏ hàng" component={Cart} options={{ tabBarIcon: ({color}) => <Icon source="cart" size={26} color={color} />}} />
+      <Tab.Screen name="Trang chủ" component={HomeStackNavigator} options={{ tabBarIcon: ({color}) => <Icon source="home" size={26} color={color} />}}/>
+      <Tab.Screen name="Tìm kiếm" component={Search} options={{ tabBarIcon: ({color}) => <Icon source="magnify" size={26} color={color}/>}}/>
+      <Tab.Screen name="Giỏ hàng" component={Cart} options={{ tabBarIcon: ({color}) => <Icon source="cart" size={26} color={color} />}} />
 
-      {user == null ? <>
-        <Tab.Screen name ="Đăng nhập" component={Login} options={{title: 'Đăng nhập', tabBarIcon: () => <Icon source="account" size={30} />}} />
-        <Tab.Screen name ="Đăng ký" component={Register} options={{title: 'Đăng ký', tabBarIcon: () => <Icon source="account-plus" size={30} />}} />
-      </>:<>
-        <Tab.Screen name ="Chat" component={Chat} options={{ tabBarIcon: ({color}) => <Icon source="chat" size={26} color={color} />}} />
-        <Tab.Screen name ="Tài khoản" component={Profile} options={{title: 'Thông tin', tabBarIcon: () => <Icon source="account" size={30} />}} />
-      </>}
+      {user === null ? (
+        <Tab.Screen 
+          name="Tài khoản" 
+          component={AuthStackNavigator} 
+          options={{
+            title: 'Tài khoản', 
+            tabBarIcon: ({color}) => <Icon source="account" size={30} color={color} />
+          }} 
+        />
+      ) : (
+        <>
+          <Tab.Screen name="Chat" component={Chat} options={{ tabBarIcon: ({color}) => <Icon source="chat" size={26} color={color} />}} />
+          <Tab.Screen name="Tài khoản" component={Profile} options={{title: 'Thông tin', tabBarIcon: ({color}) => <Icon source="account-check" size={30} color={color} />}} />
+        </>
+      )}
     </Tab.Navigator>
   );
 }
 
+export default function App() {
+  const [user, dispatch] = useReducer(MyUserReducer, null);
 
-const App = () => {
-  const [user, dispatch] = useReducer(MyUserReducer, null)
   return (
     <MyUserContext.Provider value={[user, dispatch]}>
       <NavigationContainer>
@@ -63,5 +75,3 @@ const App = () => {
     </MyUserContext.Provider>
   );
 }
-
-export default App;

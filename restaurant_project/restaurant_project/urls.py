@@ -18,7 +18,6 @@ import ckeditor_uploader
 from django.contrib import admin
 from django.urls import path, re_path, include
 from drf_yasg.views import get_schema_view
-
 from restaurant import views
 from restaurant.admin import admin_site
 from rest_framework import permissions

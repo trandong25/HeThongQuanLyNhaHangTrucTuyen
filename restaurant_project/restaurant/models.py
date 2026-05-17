@@ -44,6 +44,7 @@ class Dish(BaseModel):
     ingredients = models.ManyToManyField(Ingredient,related_name='dishes')
     prep_time = models.IntegerField(help_text="Thời gian chuẩn bị (phút)")
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,null=True, related_name='dishes')
+
     class Meta:
         unique_together = ('name', 'category')
 
@@ -55,6 +56,7 @@ class Review(BaseModel):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.DecimalField(max_digits=2, decimal_places=1, default=5.0)
     comment = models.TextField()
+    created_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('dish','customer')
