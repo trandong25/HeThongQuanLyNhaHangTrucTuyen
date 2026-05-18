@@ -10,7 +10,6 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
-
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
@@ -140,7 +139,7 @@ class DishSerializer(serializers.ModelSerializer):
         queryset=Ingredient.objects.all()
     )
     chef = UserSerializer(read_only=True)
-    avg_rating = serializers.FloatField()
+    avg_rating = serializers.FloatField(read_only=True)
     class Meta:
         model = Dish
         fields = [

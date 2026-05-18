@@ -16,7 +16,7 @@ import Styles from "./Styles";
 import Apis, {
     authApis,
     endpoints
-} from "../../configs/Apis";
+} from "../../configs/APIs";
 
 import { MyUserContext } from "../../configs/Contexts";
 

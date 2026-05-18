@@ -3,7 +3,7 @@ import Styles from "./Styles";
 import {Button,HelperText,TextInput,} from "react-native-paper";
 import * as ImgPicker from "expo-image-picker";
 import { useState } from "react";
-import Apis, { endpoints } from "../../configs/Apis";
+import Apis, { endpoints } from "../../configs/APIs";
 import { useNavigation } from "@react-navigation/native";
 
 const Register = () => {

@@ -36,7 +36,7 @@ class Ingredient(BaseModel):
         return self.name
 
 class Dish(BaseModel):
-    chef = models.ForeignKey(User,on_delete=models.CASCADE)
+    chef = models.ForeignKey(User,null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = RichTextField()
     image = CloudinaryField()
@@ -44,6 +44,7 @@ class Dish(BaseModel):
     ingredients = models.ManyToManyField(Ingredient,related_name='dishes')
     prep_time = models.IntegerField(help_text="Thời gian chuẩn bị (phút)")
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,null=True, related_name='dishes')
+
     class Meta:
         unique_together = ('name', 'category')
 

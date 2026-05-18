@@ -1,9 +1,8 @@
-from drf_yasg.utils import swagger_auto_schema
-from django.contrib.admindocs.utils import parse_rst
-from rest_framework.decorators import action, permission_classes
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
 from django.core.serializers import serialize
 from rest_framework import viewsets, generics, permissions,status, parsers,filters
-from .models import Category, Dish, User, Review,Reservation, Order,Transaction
+from .models import Category, Dish, User, Review,Reservation, Order,Transaction, OrderDetail
 from restaurant import serializers, paginators,perms
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,9 +23,11 @@ class DishViewSet(viewsets.ModelViewSet):
     queryset = Dish.objects.prefetch_related('ingredients').filter(active=True)
     serializer_class = serializers.DishSerializer
     pagination_class = paginators.DishPaginator
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
-    ordering_fields = ['price', 'created_date']
+    filterset_fields = ['category', 'price', 'prep_time']
+    ordering_fields = ['name', 'price', 'created_date']
 
     def get_serializer_class(self):
         if self.action == 'reviews':
@@ -34,16 +35,13 @@ class DishViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     def get_permissions(self):
-        if self.action == 'reviews' and self.request.method == 'POST':
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [perms.IsApprovedChef()]
+        elif self.action == 'reviews' and self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
+
         return [permissions.AllowAny()]
 
-    # @swagger_auto_schema(
-    #     method='post',
-    #     operation_description="Thêm đánh giá cho món ăn",
-    #     request_body=serializers.ReviewSerializer,
-    #     responses={201: serializers.ReviewSerializer()}
-    # )
     @action(methods=['post','get'], url_path='reviews', detail=True)
     def reviews(self, request, pk):
         if request.method.__eq__('POST'):

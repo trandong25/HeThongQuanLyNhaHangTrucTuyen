@@ -72,6 +72,9 @@ export default StyleSheet.create({
         marginTop: 10,
         backgroundColor: "#fff",
     },
+    margin: {
+        marginTop: 10,
+    },
 
     margin: {
         marginTop: 10,
