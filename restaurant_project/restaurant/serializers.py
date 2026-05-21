@@ -64,7 +64,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data['customer'] = UserSerializer(instance.customer).data
         return data
-    def  validate_rating(self, value):
+    def validate_rating(self, value):
         if value < 1 or value > 5:
             raise serializers.ValidationError("Rating must be between 1 and 5")
         return value
@@ -84,9 +84,33 @@ class ReservationSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'customer': {'read_only':True},
             'status' : {'read_only':True},
-            'table': {'write_only': True}
+            'table': {'read_only': True}
         }
 
+    def create(self, validated_data):
+        people = validated_data['number_of_people']
+        time = validated_data['reservation_time']
+
+        busy_tables = Reservation.objects.filter(
+            reservation_time=time
+        ).exclude(
+            status='CANCELLED'
+        ).values_list('table_id', flat=True)
+
+        table = Table.objects.filter(
+            is_available=True,
+            capacity__gte=people
+        ).exclude(
+            id__in=busy_tables
+        ).order_by('capacity').first()
+
+        if not table:
+            raise serializers.ValidationError(
+                "Hiện tại nhà hàng không còn bàn trống phù hợp với số lượng khách vào khung giờ này!")
+
+        validated_data['table'] = table
+
+        return super().create(validated_data)
 class OrderDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderDetail
@@ -108,7 +132,6 @@ class OrderSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        #validate_data từ is_valid(), pop để lấy dữ liêu detail ra và xóa cột đó trong validated
         details_data = validated_data.pop('order_details')
 
         #request = self.context.get('request'), request.user
