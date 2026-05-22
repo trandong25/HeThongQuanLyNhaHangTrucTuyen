@@ -2,13 +2,13 @@ import { StyleSheet } from "react-native";
 
 //Màu app
 export const COLORS = {
-    primary: '#E65100',       
+    primary: '#E65100',
     primaryLight: '#FF6D00',
     backgroundLight: '#eee4dc',
-    background: '#FFFFFF',    
-    textMain: '#333333',      
-    textSub: '#777777',       
-    warning: '#FFD700', 
+    background: '#FFFFFF',
+    textMain: '#333333',
+    textSub: '#777777',
+    warning: '#FFD700',
 };
 export default StyleSheet.create({
     container: {
@@ -26,17 +26,17 @@ export default StyleSheet.create({
         flex: 1,
         marginTop: 50
     },between :{
-        alignItems: 'center', 
+        alignItems: 'center',
         justifyContent: 'space-between',
     },
 //FoodCart
-cardWrapper: { 
-        flex: 0.5, 
-        padding: 6 
+cardWrapper: {
+        flex: 0.5,
+        padding: 6
     },
     foodCard: {
         borderRadius: 15,
-        overflow: 'hidden', 
+        overflow: 'hidden',
         backgroundColor: COLORS.background,
         elevation: 3
     },
@@ -46,55 +46,55 @@ cardWrapper: {
     },
     hotBadge: {
         position: 'absolute',
-        top: 8, 
-        right: 8, 
+        top: 8,
+        right: 8,
         backgroundColor: COLORS.primaryLight,
         paddingHorizontal: 8,
         paddingVertical: 3,
         borderRadius: 8,
     },
-    hotBadgeText: { 
-        color: COLORS.background, 
-        fontSize: 10, 
-        fontWeight: 'bold' 
+    hotBadgeText: {
+        color: COLORS.background,
+        fontSize: 10,
+        fontWeight: 'bold'
     },
-    cardContent: { 
-        paddingVertical: 12, 
-        paddingHorizontal: 10 
+    cardContent: {
+        paddingVertical: 12,
+        paddingHorizontal: 10
     },
-    foodName: { 
-        fontWeight: 'bold', 
-        color: COLORS.textMain, 
-        marginBottom: 2 
+    foodName: {
+        fontWeight: 'bold',
+        color: COLORS.textMain,
+        marginBottom: 2
     },
-    foodChef: { 
-        color: COLORS.textSub, 
-        marginBottom: 8 
+    foodChef: {
+        color: COLORS.textSub,
+        marginBottom: 8
     },
-    metaContainer: { 
-        marginBottom: 12 
+    metaContainer: {
+        marginBottom: 12
     },
-    metaItem: { 
-        marginRight: 15 
+    metaItem: {
+        marginRight: 15
     },
-    metaText: { 
-        marginLeft: 4, 
-        color: COLORS.textSub, 
-        fontSize: 12 
+    metaText: {
+        marginLeft: 4,
+        color: COLORS.textSub,
+        fontSize: 12
     },
-    priceRow: { 
-        justifyContent: 'space-between' 
-    }, 
-    priceText: { 
-        fontSize: 16, 
-        fontWeight: 'bold', 
-        color: COLORS.primary 
+    priceRow: {
+        justifyContent: 'space-between'
+    },
+    priceText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: COLORS.primary
     },
     btnAddCart: {
         backgroundColor: COLORS.primary,
         width: 34,
         height: 34,
-        borderRadius: 17, 
+        borderRadius: 17,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -137,7 +137,22 @@ cartItem: {
     mb: {
         marginBottom: 10
     },
-    wrap: {
+
+    mt: {
+        marginTop: 10
+    },
+
+    mb: {
+        marginBottom: 10
+    },
+
+    center: {
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    row: {
+        flexDirection: "row"
+    }, wrap: {
         flexWrap: "wrap"
     }, padding: {
         padding: 5
@@ -168,7 +183,15 @@ cartItem: {
         margin: 8,
     },relative:{
         position:'relative'
+    },btnCate: {
+        backgroundColor:'E65100',
+        color: 'white'
     },
+
+    row: {
+        flexDirection: "row"
+    },
+
     shadow: {
         elevation: 5,
         shadowColor: "#000"

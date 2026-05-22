@@ -36,6 +36,7 @@ export default StyleSheet.create({
         marginBottom: 10,
     },
 
+    // ===== Tabs =====
     tabContainer: {
         flexDirection: "row",
         backgroundColor: "#F2E8E3",
@@ -65,6 +66,8 @@ export default StyleSheet.create({
     tabText: {
         color: "#888",
     },
+
+    // ===== Input =====
     input: {
         marginTop: 10,
         backgroundColor: "#fff",
@@ -72,6 +75,12 @@ export default StyleSheet.create({
     margin: {
         marginTop: 10,
     },
+
+    margin: {
+        marginTop: 10,
+    },
+
+    // ===== Divider =====
     divider: {
         flexDirection: "row",
         alignItems: "center",
@@ -115,11 +124,15 @@ export default StyleSheet.create({
         borderRadius: 12,
         paddingVertical: 5,
     },
+
+    // ===== Forgot Password =====
     forgot: {
         textAlign: "right",
         color: "#FF5500",
         marginTop: 10,
     },
+
+    // ===== Avatar =====
     avatar: {
         width: 120,
         height: 120,
