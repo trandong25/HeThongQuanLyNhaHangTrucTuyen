@@ -55,45 +55,6 @@ class DishViewSet(viewsets.ModelViewSet):
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
 
-    @action(methods=['post', 'get'], url_path='reviews', detail=True)
-    def reviews(self, request, pk):
-
-        print(">>> AUTH HEADER:", request.META.get('HTTP_AUTHORIZATION', 'KHÔNG CÓ'))
-        if request.method == 'POST':
-            print(">>> User:", request.user)
-            print(">>> Auth:", request.auth)
-
-            if not request.user.is_authenticated:
-                return Response(
-                    {'error': 'Chưa xác thực'},
-                    status=status.HTTP_401_UNAUTHORIZED
-                )
-
-            if Review.objects.filter(dish_id=pk, customer=request.user).exists():
-                return Response(
-                    {'error': 'Bạn đã đánh giá món này rồi!'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-            s = serializers.ReviewSerializer(data={
-                'rating': request.data.get('rating'),
-                'comment': request.data.get('comment'),
-                'dish': pk
-            })
-            s.is_valid(raise_exception=True)
-            r = s.save(customer=request.user)
-            return Response(serializers.ReviewSerializer(r).data, status=status.HTTP_201_CREATED)
-
-        # GET — Sửa lại phần này, luôn có return
-        reviews = self.get_object().reviews.select_related('customer').all().order_by('-created_date')
-        p = paginators.DishPaginator()
-        page = p.paginate_queryset(reviews, request)
-        if page is not None:
-            serializer = serializers.ReviewSerializer(page, many=True)
-            return p.get_paginated_response(serializer.data)
-
-        # Thêm return này — trước đây thiếu dòng này
-        return Response(serializers.ReviewSerializer(reviews, many=True).data, status=status.HTTP_200_OK)
 
 class UserViewSet(viewsets.ViewSet,generics.CreateAPIView):
     queryset = User.objects.filter(is_active = True)
@@ -120,6 +81,8 @@ class ReviewViewSet(viewsets.ViewSet,generics.DestroyAPIView, generics.UpdateAPI
         if self.action in ['update', 'partial_update', 'destroy']:
             return [perms.IsReviewOwner()]
         return [permissions.IsAuthenticatedOrReadOnly()]
+
+
 
 class ReservationViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView):
     serializer_class = serializers.ReservationSerializer
@@ -168,6 +131,45 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
                 "status": transaction.status  # Vẫn đang là PENDING
             }, status=status.HTTP_200_OK)
         return Response({"error": "Phương thức thanh toán không hỗ trợ"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post', 'get'], url_path='reviews', detail=True)
+    def reviews(self, request, pk):
+
+        print(">>> AUTH HEADER:", request.META.get('HTTP_AUTHORIZATION', 'KHÔNG CÓ'))
+        if request.method == 'POST':
+            print(">>> User:", request.user)
+            print(">>> Auth:", request.auth)
+
+            if not request.user.is_authenticated:
+                return Response(
+                    {'error': 'Chưa xác thực'},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+
+            if Review.objects.filter(dish_id=pk, customer=request.user).exists():
+                return Response(
+                    {'error': 'Bạn đã đánh giá món này rồi!'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            s = serializers.ReviewSerializer(data={
+                'rating': request.data.get('rating'),
+                'comment': request.data.get('comment'),
+                'dish': pk
+            })
+            s.is_valid(raise_exception=True)
+            r = s.save(customer=request.user)
+            return Response(serializers.ReviewSerializer(r).data, status=status.HTTP_201_CREATED)
+
+        # GET — Sửa lại phần này, luôn có return
+        reviews = self.get_object().reviews.select_related('customer').all().order_by('-created_date')
+        p = paginators.DishPaginator()
+        page = p.paginate_queryset(reviews, request)
+        if page is not None:
+            serializer = serializers.ReviewSerializer(page, many=True)
+            return p.get_paginated_response(serializer.data)
+
+        return Response(serializers.ReviewSerializer(reviews, many=True).data, status=status.HTTP_200_OK)
 
 
 class CompareDishViewSet(viewsets.ViewSet):

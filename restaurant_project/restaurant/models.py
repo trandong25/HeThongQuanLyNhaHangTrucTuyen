@@ -80,7 +80,7 @@ class Reservation(BaseModel):
         ('CANCELLED', 'Đã hủy')
     ]
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reservations')
-    table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True)
+    table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True,blank=True)
     reservation_time = models.DateTimeField()
     number_of_people = models.IntegerField()
     status = models.CharField(max_length=15, choices=RESERVATION_STATUS, default='PENDING')
@@ -91,7 +91,6 @@ class Reservation(BaseModel):
 class Order(BaseModel):
     ORDER_STATUS = [
         ('PENDING','Chờ xác nhận'),
-        ('PREPARING', 'Đang chuẩn bị'),
         ('DONE', "Hoàn thành"),
         ('CANCELLED', 'Đã hủy')
     ]

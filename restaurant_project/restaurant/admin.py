@@ -9,11 +9,11 @@ from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django.utils.html import mark_safe
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.contrib import messages
-
+from django.db.models import Count, Sum
 
 class DishForm(forms.ModelForm):
-    def __init__(self,*arg, **kwargs):
-        super().__init__(*arg,**kwargs)
+    def __init__(self,*args, **kwargs):
+        super().__init__(*args,**kwargs)
         self.fields['description'].required = False
 
 class DishAdmin(admin.ModelAdmin):
@@ -72,13 +72,16 @@ class MyAdminSite(admin.AdminSite):
 
     def get_urls(self):
         return [
-            path('restaurant-stats/', self.restaurant_stats),
+            path('restaurant-stats/', self.admin_view(self.restaurant_stats)),
         ]+super().get_urls()
 
     def restaurant_stats(self,request):
-        stats = Category.objects.annotate(c=Count('dishes')).values('id', 'name', 'c')
+        category_stats = Category.objects.annotate(total_dishes=Count('dishes')).values('id', 'name', 'total_dishes')
+        revenue_stats = Order.objects.values('status').annotate(total_revenue=Sum('total_amount'))
+
         return TemplateResponse(request, 'admin/stats.html', {
-            'stats': stats
+            'category_stats': category_stats,
+            'revenue_stats': revenue_stats
         })
     
 

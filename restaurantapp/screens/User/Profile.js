@@ -1,133 +1,85 @@
-import { View, Text, Alert, ScrollView, ImageBackground } from "react-native";
-import Styles from "./Styles";
-import { useContext } from "react";
-import { MyUserContext } from "../../configs/Contexts";
-import { useNavigation } from "@react-navigation/native"
-import { Avatar, Button, Card, Divider, List } from "react-native-paper";
+import React, { useContext } from "react";
+import { View, Text, ScrollView, Alert } from "react-native";
+import { Avatar, List, Button, Appbar, Divider } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { MyUserContext } from "../../configs/Contexts";
+import { COLORS } from "../../styles/Styles"; 
 
 const Profile = () => {
-    const [user,dispatch ]= useContext(MyUserContext)
     const nav = useNavigation();
-    const handleLogout = async () => {
-        Alert.alert(
-            "Xác nhận", // 🌟 Tham số 1: Tiêu đề
-            "Bạn có chắc chắn muốn đăng xuất tài khoản không?", 
-            [ 
-                { text: "Hủy" }, 
-                { 
-                    text: "Đăng xuất",
-                    onPress: async () => {
-                        await AsyncStorage.removeItem("token");
-                        dispatch({ type: "LOGOUT" });
-                        Alert.alert("Thông báo", "Đã đăng xuất thành công!");
-                    }
-                }
-            ]
-        );
+    
+    const [user, dispatchUser] = useContext(MyUserContext);
+
+    const handleLogout = () => {
+        Alert.alert("Xác nhận", "Bạn có chắc chắn muốn đăng xuất?", [
+            { text: "Hủy", style: "cancel" },
+            { 
+                text: "Đăng xuất", 
+                onPress: async () => {
+                    await AsyncStorage.removeItem("access_token");
+                    dispatchUser({ type: "logout" });
+                },
+                style: "destructive"
+            }
+        ]);
     };
+
     return (
-        <ScrollView style={ Styles.container} showsVerticalScrollIndicator={false}>
-            {/* 1. PHẦN ẢNH NỀN VÀ AVATAR THỰC TẾ LẤY TỪ USER */}
-            <ImageBackground 
-                source={{ uri: 'https://img.freepik.com/free-photo/delicious-vietnamese-food-arrangement_23-2148971439.jpg' }} 
-                style={Styles.coverBackground}
-            >
-                <View style={Styles.overlay}> 
-                    {/* 🌟 KIỂM TRA: Nếu user có avatar thì render bằng hình ảnh, không thì dùng Text dự phòng */}
-                    {user?.avatar ? (
-                        <Avatar.Image
-                            size={85}
-                            source={{ uri: user.avatar }}
-                            style={Styles.avatar}
-                        />
-                    ) : (
-                        <Avatar.Text
-                            size={85}
-                            label={user?.username?.substring(0, 2).toUpperCase() || "US"}
-                            style={[Styles.avatar, { backgroundColor: '#E65100' }]}
-                        />
-                    )}
+        <View style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
 
-                    <Text style={Styles.username}>
-                        {user?.first_name || user?.last_name ? `${user.first_name} ${user.last_name}` : user?.username || "Khách Vãng Lai"}
+            <ScrollView contentContainerStyle={{ padding: 20 }}>
+                <View style={{ alignItems: 'center', backgroundColor: '#FFF', padding: 20, borderRadius: 15, elevation: 2, marginBottom: 20 }}>
+                    <Avatar.Image 
+                        size={90} 
+                        source={{ uri: user?.avatar || 'https://via.placeholder.com/150' }} 
+                        style={{ marginBottom: 10 }}
+                    />
+                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>
+                        {user?.first_name} {user?.last_name}
                     </Text>
-                    <View style={Styles.roleBadge}>
-                        <Text style={Styles.roleText}>{user?.role || "CUSTOMER"}</Text>
-                    </View>
+                    <Text style={{ fontSize: 14, color: 'gray', marginTop: 5 }}>
+                        @{user?.username} | Vai trò: {user?.role}
+                    </Text>
                 </View>
-            </ImageBackground>
 
-            <View Style={{ paddingHorizontal: 16, marginTop: 15 }}>
-                {/* 2. KHỐI HIỂN THỊ THÔNG TIN CHI TIẾT CÁ NHÂN */}
-                <Text style={Styles.sectionTitle}>Thông tin tài khoản</Text>
-                <Card style={Styles.infoCard}>
-                    <Card.Content>
-                        <View style={Styles.infoRow}>
-                            <Text style={Styles.infoLabel}>Tên tài khoản:</Text>
-                            <Text style={Styles.infoValue}>{user?.username || "N/A"}</Text>
-                        </View>
-                        <Divider style={Styles.rowDivider} />
-                        
-                        <View style={Styles.infoRow}>
-                            <Text style={Styles.infoLabel}>Họ và tên:</Text>
-                            <Text style={Styles.infoValue}>
-                                {user?.first_name || user?.last_name ? `${user.first_name} ${user.last_name}` : "Chưa cập nhật"}
-                            </Text>
-                        </View>
-                        <Divider Style={Styles.rowDivider} />
-
-                        <View Style={Styles.infoRow}>
-                            <Text Style={Styles.infoLabel}>Email liên hệ:</Text>
-                            <Text Style={Styles.infoValue}>{user?.email || "Chưa cập nhật"}</Text>
-                        </View>
-                    </Card.Content>
-                </Card>
-
-                {/* 3. KHỐI MENU CHỨC NĂNG & CHỈNH SỬA */}
-                <Text style={Styles.sectionTitle}>Quản lý chức năng</Text>
-                <Card style={Styles.menuCard}>
-                    <List.Item
-                        title="Chỉnh sửa thông tin"
-                        description="Cập nhật họ tên, mật khẩu cá nhân"
-                        left={props => <List.Icon {...props} icon="account-edit" color="#E65100" />} 
-                        right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => { /* nav.navigate('EditProfile') */ }} 
-                    />
-                    <Divider />
-                    <List.Item
-                        title="Lịch sử mua hàng"
-                        description="Xem các đơn hàng đã đặt"
-                        left={props => <List.Icon {...props} icon="history" color="#E65100" />}
-                        right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => { /* nav.navigate('OrderHistory') */ }} 
-                    />
-                    <Divider />
+                <View style={{ backgroundColor: '#FFF', borderRadius: 15, elevation: 2, overflow: 'hidden' }}>
                     <List.Item
                         title="Lịch sử đặt bàn"
-                        description="Quản lý danh sách đặt bàn ăn"
-                        left={props => <List.Icon {...props} icon="table-chair" color="#E65100" />}
+                        description="Theo dõi trạng thái đặt bàn của bạn"
+                        left={props => <List.Icon {...props} icon="calendar-clock" color={COLORS.primary} />}
                         right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => { /* nav.navigate('MyReservations') */ }}
+                        onPress={() => nav.navigate("MyReservations")}
                     />
-                </Card>
+                    <Divider />
+                    <List.Item
+                        title="Đơn gọi món"
+                        description="Xem các món ăn đang được chuẩn bị"
+                        left={props => <List.Icon {...props} icon="room-service-outline" color="#4CAF50" />}
+                        right={props => <List.Icon {...props} icon="chevron-right" />}
+                        onPress={() => console.log("Đi tới danh sách đơn hàng")}
+                    />
+                    <Divider />
+                    <List.Item
+                        title="Chat với nhà hàng"
+                        description="Hỗ trợ, tư vấn trực tiếp"
+                        left={props => <List.Icon {...props} icon="chat-processing-outline" color="#03A9F4" />}
+                        right={props => <List.Icon {...props} icon="chevron-right" />}
+                        onPress={() => nav.navigate("Chat")} // Chuyển sang màn hình Chat Firebase
+                    />
+                </View>
 
-                {/* 4. NÚT ĐĂNG XUẤT */}
                 <Button 
                     mode="contained" 
+                    buttonColor="#FF3B30" 
+                    style={{ marginTop: 30, paddingVertical: 5, borderRadius: 10 }}
                     onPress={handleLogout}
-                    style={Styles.logoutBtn}
-                    buttonColor="#d32f2f"
-                    icon="logout"
-                    labelStyle={{ fontWeight: "bold" }}
                 >
-                    Đăng xuất tài khoản
+                    Đăng xuất
                 </Button>
-            </View>
-        </ScrollView>
+            </ScrollView>
+        </View>
     );
-
-}
+};
 
 export default Profile;

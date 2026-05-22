@@ -10,6 +10,9 @@ export const endpoints = {
     "current-user": "/users/current-user/",
     'dish-detail':  (foodId) => `/dishes/${foodId}/`,
     'dish-reviews': (foodId) => `/dishes/${foodId}/reviews/`,
+    'cart': "/cart/",
+    'reservations': "/reservations/"
+
 };
 
 export const authApis = (token) => {
