@@ -184,7 +184,7 @@ cartItem: {
     },relative:{
         position:'relative'
     },btnCate: {
-        backgroundColor:'E65100',
+        backgroundColor:'#E65100',
         color: 'white'
     },
 

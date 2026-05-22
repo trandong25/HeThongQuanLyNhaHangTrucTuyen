@@ -6,7 +6,7 @@ import { useContext, useState } from "react";
 import { CartContext } from "../../configs/Contexts";
 import { formatPrice } from "../../components/FoodCard";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import styles from "../Reservation/Styles";
+import styles from "../Reservation/styles";
 import CheckoutFooter from "../../components/ButtonFooter";
 
 const Reservation = () => {

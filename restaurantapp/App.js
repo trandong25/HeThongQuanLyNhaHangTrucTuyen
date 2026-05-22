@@ -96,3 +96,4 @@ export default function App() {
       </CartContext.Provider>
     </MyUserContext.Provider>
   );
+}
