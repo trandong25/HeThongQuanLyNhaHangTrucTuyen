@@ -13,21 +13,35 @@ from oauthlib.uri_validate import query
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CompareDishSerializer
 from django.db.models import  Sum, Avg, F
+from .serializers import DishSerializer
 
 
 class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
-    queryset = Category.objects.filter(active = True)
+    queryset = Category.objects.filter(active = True).order_by('-id')
     serializer_class = serializers.CategorySerializer
 
+    permission_classes = [permissions.AllowAny]
+
 class DishViewSet(viewsets.ModelViewSet):
-    queryset = Dish.objects.prefetch_related('ingredients').filter(active=True)
-    serializer_class = serializers.DishSerializer
+    queryset = Dish.objects.all().order_by('-id')
+    serializer_class = DishSerializer
     pagination_class = paginators.DishPaginator
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']
     filterset_fields = ['category', 'price', 'prep_time']
     ordering_fields = ['name', 'price', 'created_date']
+
+    def get_queryset(self):
+        queryset = Dish.objects.filter(active = True).order_by('-id')
+        q =self.request.query_params.get('q')
+        if q:
+            queryset = queryset.filter(name__contains=q   )
+        category_id =   self.request.query_params.get('category_id')
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'reviews':
@@ -39,22 +53,38 @@ class DishViewSet(viewsets.ModelViewSet):
             return [perms.IsApprovedChef()]
         elif self.action == 'reviews' and self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
-
         return [permissions.AllowAny()]
 
-    @action(methods=['post','get'], url_path='reviews', detail=True)
+    @action(methods=['post', 'get'], url_path='reviews', detail=True)
     def reviews(self, request, pk):
-        if request.method.__eq__('POST'):
+
+        print(">>> AUTH HEADER:", request.META.get('HTTP_AUTHORIZATION', 'KHÔNG CÓ'))
+        if request.method == 'POST':
+            print(">>> User:", request.user)
+            print(">>> Auth:", request.auth)
+
+            if not request.user.is_authenticated:
+                return Response(
+                    {'error': 'Chưa xác thực'},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+
+            if Review.objects.filter(dish_id=pk, customer=request.user).exists():
+                return Response(
+                    {'error': 'Bạn đã đánh giá món này rồi!'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             s = serializers.ReviewSerializer(data={
                 'rating': request.data.get('rating'),
                 'comment': request.data.get('comment'),
-                'customer': request.user.pk,
                 'dish': pk
             })
             s.is_valid(raise_exception=True)
-            r = s.save()
+            r = s.save(customer=request.user)
             return Response(serializers.ReviewSerializer(r).data, status=status.HTTP_201_CREATED)
 
+        # GET — Sửa lại phần này, luôn có return
         reviews = self.get_object().reviews.select_related('customer').all().order_by('-created_date')
         p = paginators.DishPaginator()
         page = p.paginate_queryset(reviews, request)
@@ -62,11 +92,12 @@ class DishViewSet(viewsets.ModelViewSet):
             serializer = serializers.ReviewSerializer(page, many=True)
             return p.get_paginated_response(serializer.data)
 
+        # Thêm return này — trước đây thiếu dòng này
         return Response(serializers.ReviewSerializer(reviews, many=True).data, status=status.HTTP_200_OK)
+
 class UserViewSet(viewsets.ViewSet,generics.CreateAPIView):
     queryset = User.objects.filter(is_active = True)
     serializer_class = serializers.UserSerializer
-
     parser_classes = [parsers.MultiPartParser, parsers.JSONParser]
 
     @action(methods=['get', 'patch'], url_path='current-user',detail=False,permission_classes=[permissions.IsAuthenticated])
@@ -83,7 +114,12 @@ class UserViewSet(viewsets.ViewSet,generics.CreateAPIView):
 class ReviewViewSet(viewsets.ViewSet,generics.DestroyAPIView, generics.UpdateAPIView):
     queryset = Review.objects.all()
     serializer_class = serializers.ReviewSerializer
-    permission_classes = [perms.IsReviewOwner]
+
+    def get_permissions(self):
+        # Chỉ owner mới được sửa/xóa review của mình
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [perms.IsReviewOwner()]
+        return [permissions.IsAuthenticatedOrReadOnly()]
 
 class ReservationViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView):
     serializer_class = serializers.ReservationSerializer
@@ -132,48 +168,6 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
                 "status": transaction.status  # Vẫn đang là PENDING
             }, status=status.HTTP_200_OK)
         return Response({"error": "Phương thức thanh toán không hỗ trợ"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-    @action(methods=['get'], detail=True)
-    def reviews(self, request, pk=None):
-        dish = self.get_object()
-        reviews = dish.reviews.all()
-        serializer = serializers.ReviewSerializer(reviews, many=True)
-        return Response(serializer.data)
-
-    def get_queryset(self):
-        query= Dish.objects.filter(active=True).annotate(
-            avg_rating=Avg('reviews__rating')
-        )
-        q = self.request.query_params.get('q')
-        if q:
-            queryset = self.get_queryset()
-
-        category_id = self.request.query_params.get('category_id')
-        if category_id:
-            queryset = queryset.filter(category_id=category_id)
-        min_price = self.request.query_params.get('min_price')
-        max_price = self.request.query_params.get('max_price')
-
-        if min_price:
-            queryset = queryset.filter(price__gte=min_price)
-        if max_price:
-            queryset = queryset.filter(price__lte=max_price)
-        prep_time = self.request.query_params.get('prep_time')
-        if prep_time:
-            queryset = queryset.filter(prep_time__gte=prep_time)
-        ordering = self.request.query_params.get('ordering')
-        if ordering:
-            queryset = queryset.order_by(ordering)
-
-        return queryset
-
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = serializers.ReviewSerializer
-    permission_classes = [IsAuthenticated]
-    def perform_create(self, serializer):
-        serializer.save(customer=self.request.user)
 
 
 class CompareDishViewSet(viewsets.ViewSet):

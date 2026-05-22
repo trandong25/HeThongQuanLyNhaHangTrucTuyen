@@ -11,6 +11,7 @@ class BaseModel(models.Model):
     class Meta:
         abstract =True
 
+
 class User(AbstractUser):
     ROLE_CHOICES = [
         ('ADMIN','Admin'),

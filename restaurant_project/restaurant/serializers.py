@@ -56,9 +56,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ['id', 'rating', 'comment', 'created_date', 'customer', 'dish']
         extra_kwargs = {
-            'dish': {
-                'write_only': True
-            }
+            'customer': {'read_only': True}
         }
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -68,6 +66,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         if value < 1 or value > 5:
             raise serializers.ValidationError("Rating must be between 1 and 5")
         return value
+
 
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
