@@ -84,6 +84,8 @@ class ReviewViewSet(viewsets.ViewSet,generics.DestroyAPIView, generics.UpdateAPI
     queryset = Review.objects.all()
     serializer_class = serializers.ReviewSerializer
     permission_classes = [perms.IsReviewOwner]
+    def perform_create(self, serializer):
+        serializer.save(customer=self.request.user)
 
 class ReservationViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView):
     serializer_class = serializers.ReservationSerializer
@@ -167,14 +169,6 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
             queryset = queryset.order_by(ordering)
 
         return queryset
-
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = serializers.ReviewSerializer
-    permission_classes = [IsAuthenticated]
-    def perform_create(self, serializer):
-        serializer.save(customer=self.request.user)
-
 
 class CompareDishViewSet(viewsets.ViewSet):
     @action(methods=['get'], detail = False)

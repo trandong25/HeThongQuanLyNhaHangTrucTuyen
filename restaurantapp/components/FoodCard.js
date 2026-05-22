@@ -1,45 +1,71 @@
-import { TouchableOpacity, View } from "react-native"
-import { Card,Text } from "react-native-paper"
-import Styles from "../styles/Styles"
+import { Alert, TouchableOpacity, View } from "react-native"
+import { Card,Icon,Text } from "react-native-paper"
+import Styles,{COLORS} from "../styles/Styles"
+import { useContext } from "react"
+import { CartContext } from "../configs/Contexts"
+
+
+ export const formatPrice = (price) => {
+        if (!price) return '0';
+        return parseFloat(price).toLocaleString('vi-VN'); 
+    }
 
 const FoodCard = ({item, onPress}) => {
+    const [cart, dispatchCart] = useContext(CartContext);
+    
+    const handleAddToCart = () => {
+        dispatchCart({
+            type: "ADD_TO_CART",
+            payload: item
+        });
+        Alert.alert(`Đã thêm ${item.name} vào giỏ hàng`)
+    }
     return (
-        <TouchableOpacity style={[Styles.cardContainer,{flex:0.5}]} activeOpacity={0.8} onPress={onPress}>
-            <Card style={Styles.bradius}>
-                <View style = {Styles.relative}>
+        <TouchableOpacity style={Styles.cardWrapper} activeOpacity={0.8} onPress={onPress}>
+            <Card style={Styles.foodCard}>
+                <View style={{ position: 'relative' }}>
                     <Card.Cover
-                        source={{uri: item.image}}
-                        style = {Styles.margin}
+                        source={{ uri: item.image }}
+                        style={Styles.foodImage}
                     />
                     <View style={Styles.hotBadge}>
-                        <Text>Hot</Text>
+                        <Text style={Styles.hotBadgeText}>HOT</Text>
                     </View>
                 </View>
-                <Card.Content>
-                    <Text variant="titleLarge" numberOfLines={1}>
+
+                <Card.Content style={Styles.cardContent}>
+                    <Text variant="titleMedium" numberOfLines={1} style={Styles.foodName}>
                         {item.name}
                     </Text>
-                    <Text variant="bodySmall">
+                    
+                    <Text variant="bodySmall" style={Styles.foodChef}>
                         👨‍🍳 Đầu bếp {item.chef || "Đồng"}
                     </Text>
-                    <View style={Styles.row}>
-                        <Text style={Styles.margin} variant="labelMedium" >⭐ {item.rating || '4.9'}</Text>
-                        <Text style={Styles.margin} variant="labelMedium" >🕒 {item.prep_time || '20 phút'}</Text>
-                    </View>
-                    <View style={[Styles.center,Styles.row]}>
-                        <Text style={Styles.price} >
-                            {item.price ? item.price.toLocaleString('vi-VN') : '0'}đ
-                        </Text>
-            
-                        <View style= {[Styles.center,Styles.bgColor,Styles.add,Styles.bradius]}>
-                            <Text>+</Text>
+                    
+                    <View style={[Styles.row, Styles.metaContainer]}>
+                        <View style={[Styles.row, Styles.metaItem]}>
+                            <Icon source="star" size={14} color={COLORS.warning} />
+                            <Text style={Styles.metaText}>{item.rating || '4.9'}</Text>
                         </View>
+                        <View style={Styles.row}>
+                            <Icon source="clock-outline" size={14} color={COLORS.primary} />
+                            <Text style={Styles.metaText}>{item.prep_time || '20'} phút</Text>
+                        </View>
+                    </View>
+
+                    <View style={[Styles.row, Styles.priceRow]}>
+                        <Text style={Styles.priceText} >
+                            {formatPrice(item.price)}đ
+                        </Text>
+
+                        <TouchableOpacity onPress={handleAddToCart} style={Styles.btnAddCart}>
+                            <Icon source="plus" size={20} color="white" />
+                        </TouchableOpacity>
                     </View>
                 </Card.Content>
             </Card>
         </TouchableOpacity>
     )
-
 }
 
 export default FoodCard;

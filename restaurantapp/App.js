@@ -10,8 +10,10 @@ import Chat from "./screens/Chat/Chat";
 import Profile from "./screens/User/Profile";
 import Login from "./screens/User/Login";
 import Register from "./screens/User/Register";
-import { MyUserContext } from "./configs/Contexts";
-import { MyUserReducer } from "./configs/Contexts";
+import { CartContext, MyUserContext } from "./configs/Contexts";
+import {MyUserReducer} from "./reducers/UserReducer";
+import { CartReducer } from "./reducers/CartReducer";
+import Reservation from "./screens/Reservation/Reservation";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -34,6 +36,8 @@ const AuthStackNavigator = () => {
 
 const TabNavigator = () => {
   const [user, ] = useContext(MyUserContext);
+  const [cart,] = useContext(CartContext);
+  const cartCount = Object.values(cart).reduce((total, item)=> total+item.quantity, 0);
 
   return (
     <Tab.Navigator screenOptions={{
@@ -41,9 +45,14 @@ const TabNavigator = () => {
       tabBarActiveTintColor: '#E65100',
       tabBarInactiveTintColor: 'gray'
     }}>
-      <Tab.Screen name="Trang chủ" component={HomeStackNavigator} options={{ tabBarIcon: ({color}) => <Icon source="home" size={26} color={color} />}}/>
-      <Tab.Screen name="Tìm kiếm" component={Search} options={{ tabBarIcon: ({color}) => <Icon source="magnify" size={26} color={color}/>}}/>
-      <Tab.Screen name="Giỏ hàng" component={Cart} options={{ tabBarIcon: ({color}) => <Icon source="cart" size={26} color={color} />}} />
+      <Tab.Screen name="Home" component={HomeStackNavigator} options={{ tabBarIcon: ({color}) => <Icon source="home" size={26} color={color} />}}/>
+      <Tab.Screen name="Search" component={Search} options={{ tabBarIcon: ({color}) => <Icon source="magnify" size={26} color={color}/>}}/>
+      <Tab.Screen 
+        name="Cart" component={Cart} 
+        options={{ tabBarIcon: ({color}) => <Icon source="shopping-outline" size={26} color={color} />,
+          tabBarBadge: cartCount > 0 ? cartCount: null
+        }} 
+      />
 
       {user === null ? (
         <Tab.Screen 
@@ -64,13 +73,27 @@ const TabNavigator = () => {
   );
 }
 
+const RootNavigator = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MainTabs" component={TabNavigator} />
+      
+      <Stack.Screen name="Reservation" component={Reservation} />
+    </Stack.Navigator>
+  );
+}
+
 export default function App() {
-  const [user, dispatch] = useReducer(MyUserReducer, null);
+  const [user, dispatchUser] = useReducer(MyUserReducer, null);
+  const [cart, dispatchCart] = useReducer(CartReducer, {});
 
   return (
-    <MyUserContext.Provider value={[user, dispatch]}>
-      <NavigationContainer>
-        <TabNavigator/>
-      </NavigationContainer>
+    <MyUserContext.Provider value={[user, dispatchUser]}>
+      <CartContext.Provider value={[cart, dispatchCart]}>
+        <NavigationContainer>
+          <RootNavigator />
+        </NavigationContainer>
+      </CartContext.Provider>
     </MyUserContext.Provider>
   );
+}
