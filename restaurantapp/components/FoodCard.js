@@ -10,6 +10,7 @@ import { CartContext } from "../configs/Contexts"
         return parseFloat(price).toLocaleString('vi-VN'); 
     }
 
+
 const FoodCard = ({item, onPress}) => {
     const [cart, dispatchCart] = useContext(CartContext);
     
@@ -21,7 +22,9 @@ const FoodCard = ({item, onPress}) => {
         Alert.alert(`Đã thêm ${item.name} vào giỏ hàng`)
     }
     return (
-        <TouchableOpacity style={Styles.cardWrapper} activeOpacity={0.8} onPress={onPress}>
+
+        
+         <TouchableOpacity style={Styles.cardWrapper} activeOpacity={0.8} onPress={onPress}>
             <Card style={Styles.foodCard}>
                 <View style={{ position: 'relative' }}>
                     <Card.Cover
@@ -39,8 +42,9 @@ const FoodCard = ({item, onPress}) => {
                     </Text>
                     
                     <Text variant="bodySmall" style={Styles.foodChef}>
-                        👨‍🍳 Đầu bếp {item.chef || "Đồng"}
+                        👨‍🍳 Đầu bếp {item.chef?.first_name || item.chef?.username || "Đồng"}
                     </Text>
+
                     
                     <View style={[Styles.row, Styles.metaContainer]}>
                         <View style={[Styles.row, Styles.metaItem]}>
@@ -59,7 +63,8 @@ const FoodCard = ({item, onPress}) => {
                         </Text>
 
                         <TouchableOpacity onPress={handleAddToCart} style={Styles.btnAddCart}>
-                            <Icon source="plus" size={20} color="white" />
+                            <Icon source="plus" size={20} color="white" /> 
+
                         </TouchableOpacity>
                     </View>
                 </Card.Content>

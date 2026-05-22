@@ -22,6 +22,9 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 from restaurant.models import Category, Ingredient, Dish, Table
+from django.contrib.auth import get_user_model
+
+
 
 # 1. Khởi tạo Danh mục (Categories)
 c1, _ = Category.objects.get_or_create(name='Món Chính', defaults={'description': 'Món ăn no cho bữa chính'})

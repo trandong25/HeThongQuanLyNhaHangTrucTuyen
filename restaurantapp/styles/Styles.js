@@ -195,6 +195,60 @@ cartItem: {
     shadow: {
         elevation: 5,
         shadowColor: "#000"
+    },
+    cardContainer: {
+        flex: 1,
+        margin: 8,
+        elevation: 3, 
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    foodImage: {
+        height: 130, 
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+    },
+    hotBadge: {
+        position: 'absolute',
+        top: 8, 
+        right: 8, 
+        backgroundColor: '#FF6D00',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        elevation: 2,
+    },
+    hotText: {
+        color: '#fff',
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+    priceRow: {
+        flexDirection: "row",
+        justifyContent: "space-between", 
+        alignItems: "center",
+        marginTop: 10,
+    },
+    price: { 
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#E65100'
+    },
+    addBtn: {
+        width: 34, 
+        height: 34,
+        backgroundColor: '#E65100',
+        borderRadius: 17, 
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    addBtnText: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginTop: -2 
     }
 
 });

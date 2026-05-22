@@ -10,18 +10,23 @@ import Chat from "./screens/Chat/Chat";
 import Profile from "./screens/User/Profile";
 import Login from "./screens/User/Login";
 import Register from "./screens/User/Register";
+import { MyUserReducer } from "./reducers/UserReducer";
+import { StackScreen } from "react-native-screens";
+import FoodDetail from "./screens/Home/FoodDetail";
 import { CartContext, MyUserContext } from "./configs/Contexts";
-import {MyUserReducer} from "./reducers/UserReducer";
 import { CartReducer } from "./reducers/CartReducer";
 import Reservation from "./screens/Reservation/Reservation";
 
-const Stack = createNativeStackNavigator();
+
+const Stack = createNativeStackNavigator(); 
 const Tab = createBottomTabNavigator();
 
 const HomeStackNavigator = () =>{
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="index" component={Home}/>
+      <Stack.Screen name="food-detail" component={FoodDetail} 
+                  options={{ headerShown:true ,title:"Chi tiết món ăn"}} />
     </Stack.Navigator>
   )
 }
@@ -96,4 +101,6 @@ export default function App() {
       </CartContext.Provider>
     </MyUserContext.Provider>
   );
+
 }
+

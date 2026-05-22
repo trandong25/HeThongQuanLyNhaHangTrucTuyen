@@ -115,8 +115,7 @@ const Login = () => {
                 payload: u.data,
             });
 
-            // navigate home
-            // nav.navigate("Home");
+            nav.navigate("Trang chủ");
 
         } catch (ex) {
 
