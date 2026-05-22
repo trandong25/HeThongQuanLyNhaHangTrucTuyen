@@ -145,13 +145,52 @@ export default StyleSheet.create({
         marginTop: 15,
         alignItems: "center",
     },
-
     avatarText: {
         color: "#FF5500",
         fontWeight: "bold",
     },
     inputOutline: {
-    borderRadius: 16,
-    borderColor: "#E8D9D0",
+        borderRadius: 16,
+        borderColor: "#E8D9D0",
     },
+    container: { flex: 1, backgroundColor: "#f5f5f5" },
+    coverBackground: { width: "100%", height: 200 },
+    overlay: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.45)", 
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    avatar: {
+        borderWidth: 2,
+        borderColor: "#fff",
+        elevation: 5
+    },
+    username: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "#fff",
+        marginTop: 10,
+        textShadowColor: "rgba(0, 0, 0, 0.75)",
+        textShadowOffset: { width: -1, height: 1 },
+        textShadowRadius: 5
+    },
+    roleBadge: {
+        backgroundColor: "#FFE0B2",
+        paddingHorizontal: 12,
+        paddingVertical: 3,
+        borderRadius: 12,
+        marginTop: 6
+    },
+    roleText: { color: "#E65100", fontWeight: "bold", fontSize: 11 },
+    
+    sectionTitle: { fontSize: 14, fontWeight: "bold", color: "#666", marginTop: 18, marginBottom: 8, paddingLeft: 4 },
+    infoCard: { backgroundColor: "#fff", borderRadius: 12, elevation: 1 },
+    infoRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 10 },
+    infoLabel: { color: "#777", fontWeight: "500" },
+    infoValue: { color: "#333", fontWeight: "bold" },
+    rowDivider: { backgroundColor: "#eee" },
+
+    menuCard: { backgroundColor: "#fff", borderRadius: 12, elevation: 1, overflow: "hidden" },
+    logoutBtn: { borderRadius: 8, marginTop: 25, marginBottom: 35, paddingVertical: 4 }
 });

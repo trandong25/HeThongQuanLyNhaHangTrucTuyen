@@ -1,45 +1,49 @@
 import { TouchableOpacity, View } from "react-native"
-import { Card,Text } from "react-native-paper"
+import { Card, Text } from "react-native-paper"
 import Styles from "../styles/Styles"
 
 const FoodCard = ({item, onPress}) => {
     return (
-        <TouchableOpacity style={[Styles.cardContainer,{flex:0.5}]} activeOpacity={0.8} onPress={onPress}>
+        <TouchableOpacity style={[Styles.cardContainer, {flex: 0.5}]} activeOpacity={0.8} onPress={onPress}>
             <Card style={Styles.bradius}>
-                <View style = {Styles.relative}>
+                <View style={Styles.relative}>
                     <Card.Cover
                         source={{uri: item.image}}
-                        style = {Styles.margin}
+                        style={Styles.foodImage} 
                     />
                     <View style={Styles.hotBadge}>
-                        <Text>Hot</Text>
+                        <Text style={Styles.hotText}>HOT</Text>
                     </View>
                 </View>
-                <Card.Content>
-                    <Text variant="titleLarge" numberOfLines={1}>
-                        {item.name}
+                
+                <Card.Content style={{ paddingTop: 12 }}>
+                    <Text variant="titleMedium" numberOfLines={1} style={{ fontWeight: 'bold' }}>
+                            {item.name}
+                    </Text>        
+                    
+                    <Text variant="bodySmall" style={{ color: 'gray', marginTop: 4 }}>
+                        👨‍🍳 Đầu bếp {item.chef?.first_name || "Đồng"}
                     </Text>
-                    <Text variant="bodySmall">
-                        👨‍🍳 Đầu bếp {item.chef || "Đồng"}
-                    </Text>
-                    <View style={Styles.row}>
-                        <Text style={Styles.margin} variant="labelMedium" >⭐ {item.rating || '4.9'}</Text>
-                        <Text style={Styles.margin} variant="labelMedium" >🕒 {item.prep_time || '20 phút'}</Text>
+
+                    <View style={[Styles.row, { marginTop: 6 }]}>
+                        <Text variant="labelMedium">⭐ {item.rating || '4.9'}</Text>
+                        <Text style={{ marginLeft: 15 }} variant="labelMedium">🕒 {item.prep_time} phút</Text>
                     </View>
-                    <View style={[Styles.center,Styles.row]}>
-                        <Text style={Styles.price} >
-                            {item.price ? item.price.toLocaleString('vi-VN') : '0'}đ
+
+                    {/* Dòng chứa Giá tiền và nút Thêm */}
+                    <View style={Styles.priceRow}>
+                        <Text style={Styles.price}>
+                            {item.price ? parseInt(item.price).toLocaleString('vi-VN') : '0'}đ
                         </Text>
             
-                        <View style= {[Styles.center,Styles.bgColor,Styles.add,Styles.bradius]}>
-                            <Text>+</Text>
-                        </View>
+                        <TouchableOpacity style={Styles.addBtn}>
+                            <Text style={Styles.addBtnText}>+</Text>
+                        </TouchableOpacity>
                     </View>
                 </Card.Content>
             </Card>
         </TouchableOpacity>
     )
-
 }
 
 export default FoodCard;

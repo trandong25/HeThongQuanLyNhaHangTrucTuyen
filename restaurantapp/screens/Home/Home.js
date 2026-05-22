@@ -108,7 +108,7 @@ const Home = () => {
                 renderItem={({item}) => (
                     <FoodCard 
                         item={item} 
-                        onPress={() => nav.navigate('food-details', { foodId: item.id })} 
+                        onPress={() => nav.navigate('food-detail', { foodId: item.id })} 
                     />
                
             )}

@@ -11,15 +11,19 @@ import Profile from "./screens/User/Profile";
 import Login from "./screens/User/Login";
 import Register from "./screens/User/Register";
 import { MyUserContext } from "./configs/Contexts";
-import { MyUserReducer } from "./configs/Contexts";
+import { MyUserReducer } from "./reducers/UserReducer";
+import { StackScreen } from "react-native-screens";
+import FoodDetail from "./screens/Home/FoodDetail";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator(); 
 const Tab = createBottomTabNavigator();
 
 const HomeStackNavigator = () =>{
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="index" component={Home}/>
+      <Stack.Screen name="food-detail" component={FoodDetail} 
+                  options={{ headerShown:true ,title:"Chi tiết món ăn"}} />
     </Stack.Navigator>
   )
 }
@@ -74,3 +78,4 @@ export default function App() {
       </NavigationContainer>
     </MyUserContext.Provider>
   );
+}
