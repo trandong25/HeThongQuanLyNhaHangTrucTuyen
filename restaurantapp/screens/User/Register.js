@@ -40,6 +40,8 @@ const Register = () => {
     const [user, setUser] = useState({});
     const [err, setErr] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const nav = useNavigation();
 
@@ -149,111 +151,99 @@ const Register = () => {
 
     return (
     <ScrollView
-        contentContainerStyle={[
-            Styles.container,
-        ]}
+        style={Styles.container}
+        contentContainerStyle={Styles.scrollContent}
         showsVerticalScrollIndicator={false}
     >
-
-        {/* Title */}
-        <Text style={Styles.title}>
-            Tạo tài khoản ✨
-        </Text>
-
-        <Text style={Styles.subtitle}>
-            Đăng ký để bắt đầu trải nghiệm
-        </Text>
+        <Text style={Styles.title}>Tạo tài khoản ✨</Text>
+        <Text style={Styles.subtitle}>Đăng ký để bắt đầu trải nghiệm</Text>
 
         {/* Tabs */}
         <View style={Styles.tabContainer}>
-
-            <TouchableOpacity
-                style={Styles.tab}
-                onPress={() => nav.navigate("Login")}
-            >
-                <Text style={Styles.tabText}>
-                    Đăng nhập
-                </Text>
+            <TouchableOpacity style={Styles.tab} onPress={() => nav.navigate("Login")}>
+                <Text style={Styles.tabText}>Đăng nhập</Text>
             </TouchableOpacity>
-
             <View style={Styles.activeTab}>
-                <Text style={Styles.activeTabText}>
-                    Đăng ký
-                </Text>
+                <Text style={Styles.activeTabText}>Đăng ký</Text>
             </View>
-
         </View>
 
-        {/* Error */}
-        {err && (
-            <HelperText
-                type="error"
-                visible={true}
-            >
-                {err}
-            </HelperText>
-        )}
+        {err && <HelperText type="error" visible>{err}</HelperText>}
 
-        {/* Inputs */}
-        {userInfo.map((i) => (
-            <TextInput
-                key={i.field}
-                style={Styles.input}
-                value={user[i.field]}
-                onChangeText={(t) =>
-                    setUser({
-                        ...user,    
-                        [i.field]: t,
-                    })
-                }
-                label={i.label}
-                secureTextEntry={i.secureTextEntry}
-                mode="outlined"
-                outlineStyle={Styles.inputOutline}
-                right={
-                    <TextInput.Icon icon={i.icon} />
-                }
-            />
-        ))}
+        {userInfo.map((i) => {
+            const isPassword = i.field === "password";
+            const isConfirm  = i.field === "confirm";
+
+            return (
+                <TextInput
+                    key={i.field}
+                    style={Styles.input}
+                    value={user[i.field]}
+                    onChangeText={(t) => setUser({ ...user, [i.field]: t })}
+                    label={i.label}
+                    secureTextEntry={
+                        (isPassword && !showPassword) ||
+                        (isConfirm  && !showConfirm)
+                    }
+                    mode="outlined"
+                    outlineStyle={Styles.inputOutline}
+                    right={
+                        isPassword ? (
+                            <TextInput.Icon
+                                icon={showPassword ? "eye-off" : "eye"}
+                                onPress={() => setShowPassword(!showPassword)}
+                            />
+                        ) : isConfirm ? (
+                            <TextInput.Icon
+                                icon={showConfirm ? "eye-off" : "eye"}
+                                onPress={() => setShowConfirm(!showConfirm)}
+                            />
+                        ) : (
+                            <TextInput.Icon icon={i.icon} />
+                        )
+                    }
+                />
+            );
+        })}
 
         {/* Avatar Picker */}
-        <TouchableOpacity
-            style={Styles.avatarPicker}
-            onPress={picker}
-        >
-            <Text style={Styles.avatarText}>
-                Chọn ảnh đại diện
-            </Text>
+        <TouchableOpacity style={Styles.avatarPicker} onPress={picker}>
+            <Text style={Styles.avatarText}>📷 Chọn ảnh đại diện</Text>
         </TouchableOpacity>
 
-        {/* Avatar Preview */}
         {user.avatar && (
-            <Image
-                source={{ uri: user.avatar.uri }}
-                style={Styles.avatar}
-            />
+            <Image source={{ uri: user.avatar.uri }} style={Styles.avatar} />
         )}
 
-        {/* Register Button */}
-        <Button loading={loading} disabled={loading} onPress={register} style={Styles.registerBtn}
-            mode="contained" contentStyle={{ height: 58,}}>Đăng ký</Button>
+        <Button
+            loading={loading}
+            disabled={loading}
+            onPress={register}
+            style={Styles.registerBtn}
+            mode="contained"
+            contentStyle={{ height: 52 }}
+        >
+            Đăng ký
+        </Button>
 
-        {/* Divider */}
         <View style={Styles.divider}>
             <View style={Styles.line} />
             <Text style={Styles.dividerText}>hoặc tiếp tục với</Text>
             <View style={Styles.line} />
         </View>
 
-        {/* Google */}
-        <Button icon="google" mode="outlined" bstyle={Styles.ggBtn}
-            contentStyle={{ height: 56,}}>Đăng nhập bằng Google</Button>
+        <Button icon="google" mode="outlined" style={Styles.ggBtn}
+            contentStyle={{ height: 50 }}>
+            Đăng nhập bằng Google
+        </Button>
 
-        {/* Facebook */}
         <Button icon="facebook" mode="contained" style={Styles.fbBtn}
-                contentStyle={{ height: 56,}} >Đăng nhập bằng Facebook</Button>
+            contentStyle={{ height: 50 }}>
+            Đăng nhập bằng Facebook
+        </Button>
+
     </ScrollView>
-    );
+);
 };
 
 export default Register;
