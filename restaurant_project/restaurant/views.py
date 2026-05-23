@@ -11,7 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.functions import TruncDay
 from oauthlib.uri_validate import query
 from rest_framework.permissions import IsAuthenticated
-from .serializers import CompareDishSerializer
+from .serializers import CompareDishSerializer, ReviewSerializer
 from django.db.models import  Sum, Avg, F
 from .serializers import DishSerializer
 
@@ -40,6 +40,18 @@ class DishViewSet(viewsets.ModelViewSet):
         category_id =   self.request.query_params.get('category_id')
         if category_id:
             queryset = queryset.filter(category_id=category_id)
+        prep_time_max = self.request.query_params.get('prep_time_max')
+        if prep_time_max:
+            queryset = queryset.filter(prep_time__lte=prep_time_max)
+        price_max = self.request.query_params.get('price_max')
+        if price_max:
+            queryset = queryset.filter(price__lte=price_max)
+        chef_name = self.request.query_params.get('chef_name')
+        if chef_name:
+            queryset = queryset.filter(chef__username__icontains=chef_name)
+        ordering = self.request.query_params.get('ordering')
+        if ordering in ['name','-name' ,'price','-price']:
+                queryset=queryset.order_by(ordering)
 
         return queryset
 
@@ -54,6 +66,21 @@ class DishViewSet(viewsets.ModelViewSet):
         elif self.action == 'reviews' and self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
+
+    @action(detail=True, methods=['get'], url_path='reviews')
+    def get_reviews(self, request, pk=None):
+        try:
+            dish = self.get_object()
+            reviews = Review.objects.filter(dish=dish).order_by('-created_date')
+            page = self.paginate_queryset(reviews)
+            if page is not None:
+                serializer = ReviewSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = ReviewSerializer(reviews, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Dish.DoesNotExist:
+            return Response({"detail": "Không tìm thấy món ăn này"}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 class UserViewSet(viewsets.ViewSet,generics.CreateAPIView):

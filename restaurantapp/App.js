@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Icon } from 'react-native-paper';
 import Home from "./screens/Home/Home";
-import Search from "./screens/Search/Search";
+import Search from "./screens/Search/SearchScreen";
 import Cart from "./screens/Cart/Cart";
 import Chat from "./screens/Chat/Chat";
 import Profile from "./screens/User/Profile";
@@ -16,6 +16,7 @@ import FoodDetail from "./screens/Home/FoodDetail";
 import { CartContext, MyUserContext } from "./configs/Contexts";
 import { CartReducer } from "./reducers/CartReducer";
 import Reservation from "./screens/Reservation/Reservation";
+import SearchScreen from "./screens/Search/SearchScreen";
 
 
 const Stack = createNativeStackNavigator(); 
@@ -25,6 +26,8 @@ const HomeStackNavigator = () =>{
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="index" component={Home}/>
+      <Stack.Screen name="SearchScreen" component={SearchScreen}
+                options={{ headerShown: true, title: "Tìm kiếm món ăn" }}/>
       <Stack.Screen name="food-detail" component={FoodDetail} 
                   options={{ headerShown:true ,title:"Chi tiết món ăn"}} />
     </Stack.Navigator>

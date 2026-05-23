@@ -249,6 +249,102 @@ cartItem: {
         fontSize: 20,
         fontWeight: 'bold',
         marginTop: -2 
-    }
+    },
+    //Search
+    container: { 
+        flex: 1, 
+        backgroundColor: "#fff" 
+    },
+    searchRow: { 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        paddingHorizontal: 16, 
+        paddingTop: 12 },
+    nativeSearchbar: { 
+        flex: 1, 
+        height: 45, 
+        backgroundColor: '#f1f1f1', 
+        borderRadius: 8, 
+        paddingHorizontal: 12, 
+        color: '#000',
+        fontSize: 15
+    },
+    filterButton: { 
+        marginLeft: 10, 
+        backgroundColor: '#E65100', 
+        paddingHorizontal: 12, 
+        height: 45, 
+        justifyContent: 'center', 
+        borderRadius: 8 
+    },
+    filterButtonText: { color: '#fff', fontWeight: 'bold' },
+    advancedPanel: { 
+        backgroundColor: '#FFF3E0', 
+        padding: 12, 
+        marginHorizontal: 16, 
+        marginTop: 10, 
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#FFE0B2'
+    },
+    panelTitle: { 
+        fontWeight: 'bold', 
+        color: '#E65100', 
+        marginBottom: 8 
+    },
+    nativeInput: { 
+        height: 40, 
+        backgroundColor: '#fff', 
+        borderRadius: 6, 
+        paddingHorizontal: 10, 
+        borderWidth: 1, 
+        borderColor: '#ccc',
+        color: '#000'
+    },
+    sortBar: { 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        paddingHorizontal: 16, 
+        marginVertical: 10 },
+    resultCount: { 
+        color: '#666', 
+        fontStyle: 'italic' 
+    },
+    sortDropdownButton: { 
+        borderWidth: 1, 
+        borderColor: '#E65100', 
+        paddingVertical: 6, 
+        paddingHorizontal: 12, 
+        borderRadius: 6 },
+    sortDropdownText: { 
+        color: '#E65100', 
+        fontWeight: '500' 
+    },
+    sortOptionsContainer: { 
+        ackgroundColor: '#fff', 
+        marginHorizontal: 16, 
+        borderWidth: 1, 
+        borderColor: '#ddd', 
+        borderRadius: 6, 
+        marginBottom: 8, 
+        elevation: 3 
+    },
+    sortItem: { 
+        paddingVertical: 10, 
+        paddingHorizontal: 16, 
+        borderBottomWidth: 1, 
+        borderBottomColor: '#eee' 
+    },
+    sortText: { color: '#333' },
+    sortTextActive: { 
+        color: '#E65100', 
+        fontWeight: 'bold' 
+    },
+    emptyText: { 
+        textAlign: 'center',
+         marginTop: 30, 
+         color: '#999', 
+         fontStyle: 'italic' }
 
 });

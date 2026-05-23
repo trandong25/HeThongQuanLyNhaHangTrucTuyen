@@ -1,115 +1,12 @@
-import { useState, useEffect } from "react"
-import APIs, { endpoints } from "../../configs/APIs"
-import { Alert, ScrollView, View, Image } from "react-native"
-import { ActivityIndicator, Avatar, Divider, Text } from "react-native-paper"
+import { View, Text } from "react-native";
+import Styles from "../../styles/Styles"; // Đảm bảo đường dẫn này đúng
 
-const FoodDetail = ({ route }) => {
-    const foodId = route.params?.foodId; 
-
-    const [item, setItem] = useState(null);
-    const [loadingDetail, setLoadingDetail] = useState(true);
-    
-    // Giữ lại state cho danh sách reviews
-    const [reviews, setReviews] = useState([]);
-    const [loadingReviews, setLoadingReviews] = useState(false);
-
-    const loadFoodDetail = async () => {
-        try {
-            setLoadingDetail(true);
-            let res = await APIs.get(endpoints['dish-detail'](foodId)); 
-            setItem(res.data);
-        } catch (error) {
-            console.error("Lỗi tải chi tiết món ăn:", error);
-            Alert.alert("Lỗi", "Không thể tải thông tin món ăn.");
-        } finally {
-            setLoadingDetail(false);
-        }
-    };
-
-    // Giữ lại hàm load reviews
-    const loadReviews = async () => {
-        try {
-            setLoadingReviews(true);
-            let res = await APIs.get(endpoints['dish-reviews'](foodId)); 
-            setReviews(res.data.results || res.data);
-        } catch (error) {
-            console.error("Lỗi tải reviews:", error);
-        } finally {
-            setLoadingReviews(false);
-        }
-    };
-
-    useEffect(() => {
-        if (foodId) loadFoodDetail();
-    }, [foodId]);
-
-    useEffect(() => {
-        if (item?.id) loadReviews();
-    }, [item?.id]);
-
-    if (loadingDetail) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color="#E65100" />
-            </View>
-        );
-    }
-
-    if (!item) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Không có dữ liệu món ăn!</Text>
-            </View>
-        );
-    }
-
+const Chat = () => {
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: '#fff' }}>
-            {item.image && (
-                <Image source={{ uri: item.image }} style={{ width: '100%', height: 220 }} />
-            )}
-
-            <View style={{ padding: 16 }}>
-                <Text variant="headlineSmall" style={{ fontWeight: 'bold' }}>{item.name}</Text>
-                <Text variant="titleLarge" style={{ color: '#E65100', fontWeight: 'bold', marginVertical: 6 }}>
-                    {parseInt(item.price).toLocaleString('vi-VN')}đ
-                </Text>
-                <Text variant="bodyMedium" style={{ color: '#666' }}>{item.description}</Text>
-            </View>
-
-            <Divider style={{ marginHorizontal: 16 }} />
-
-            {/* PHẦN HIỂN THỊ DANH SÁCH ĐÁNH GIÁ CỦA KHÁCH HÀNG */}
-            <View style={{ padding: 16 }}>
-                <Text variant="titleMedium" style={{ fontWeight: 'bold', marginBottom: 12 }}>
-                    Khách hàng đánh giá ({reviews.length})
-                </Text>
-
-                {loadingReviews ? (
-                    <ActivityIndicator size="small" color="#E65100" />
-                ) : reviews.length === 0 ? (
-                    <Text style={{ fontStyle: 'italic', color: '#999' }}>Chưa có bình luận nào.</Text>
-                ) : (
-                    reviews.map((rev) => (
-                        <View key={rev.id} style={{ flexDirection: 'row', marginBottom: 15, backgroundColor: '#f9f9f9', padding: 10, borderRadius: 8 }}>
-                            <Avatar.Text
-                                size={36}
-                                label={rev.customer?.username?.substring(0, 2).toUpperCase() || "UN"}
-                                style={{ backgroundColor: '#E65100', marginRight: 10 }}
-                            />
-                            <View style={{ flex: 1 }}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text style={{ fontWeight: 'bold' }}>{rev.customer?.username || "Người dùng"}</Text>
-                                    <Text style={{ color: '#FFD700' }}>{'★'.repeat(Math.floor(rev.rating))}</Text>
-                                </View>
-                                <Text style={{ color: '#444', marginTop: 4 }}>{rev.comment}</Text>
-                            </View>
-                        </View>
-                    ))
-                )}
-            </View>
-        </ScrollView>
+        <View style={[Styles.container, Styles.center]}>
+            <Text style={{ fontSize: 20 }}>Đây là màn hình Chat</Text>
+        </View>
     );
-};
+}
 
-export default FoodDetail;
+export default Chat;
