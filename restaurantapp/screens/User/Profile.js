@@ -18,7 +18,7 @@ const Profile = () => {
                 text: "Đăng xuất", 
                 onPress: async () => {
                     await AsyncStorage.removeItem("access_token");
-                    dispatchUser({ type: "logout" });
+                    dispatchUser({ type: "LOGOUT" });
                 },
                 style: "destructive"
             }
@@ -57,7 +57,7 @@ const Profile = () => {
                         description="Xem các món ăn đang được chuẩn bị"
                         left={props => <List.Icon {...props} icon="room-service-outline" color="#4CAF50" />}
                         right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => console.log("Đi tới danh sách đơn hàng")}
+                        onPress={() => nav.navigate("Order")}
                     />
                     <Divider />
                     <List.Item
@@ -65,7 +65,7 @@ const Profile = () => {
                         description="Hỗ trợ, tư vấn trực tiếp"
                         left={props => <List.Icon {...props} icon="chat-processing-outline" color="#03A9F4" />}
                         right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => nav.navigate("Chat")} // Chuyển sang màn hình Chat Firebase
+                        onPress={() => nav.navigate("Chat")} 
                     />
                 </View>
 

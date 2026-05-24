@@ -2,7 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from django.core.serializers import serialize
 from rest_framework import viewsets, generics, permissions,status, parsers,filters
-from .models import Category, Dish, User, Review,Reservation, Order,Transaction, OrderDetail
+from .models import Category, Dish, User, Review, Reservation, Order, Transaction, OrderDetail, Ingredient
 from restaurant import serializers, paginators,perms
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,7 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.functions import TruncDay
 from oauthlib.uri_validate import query
 from rest_framework.permissions import IsAuthenticated
-from .serializers import CompareDishSerializer
+from .serializers import CompareDishSerializer, IngredientSerializer
 from django.db.models import  Sum, Avg, F
 from .serializers import DishSerializer
 
@@ -23,8 +23,8 @@ class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
 class DishViewSet(viewsets.ModelViewSet):
-    queryset = Dish.objects.all().order_by('-id')
-    serializer_class = DishSerializer
+    queryset = Dish.objects.prefetch_related('ingredients').filter(active=True)
+    serializer_class = serializers.DishSerializer
     pagination_class = paginators.DishPaginator
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -53,12 +53,41 @@ class DishViewSet(viewsets.ModelViewSet):
             return [perms.IsApprovedChef()]
         elif self.action == 'reviews' and self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
+
         return [permissions.AllowAny()]
 
+    @action(methods=['post','get'], url_path='reviews', detail=True)
+    def reviews(self, request, pk):
+        if request.method.__eq__('POST'):
+            s = serializers.ReviewSerializer(data={
+                'rating': request.data.get('rating'),
+                'comment': request.data.get('comment'),
+                'customer': request.user.pk,
+                'dish': pk
+            })
+            s.is_valid(raise_exception=True)
+            r = s.save()
+            return Response(serializers.ReviewSerializer(r).data, status=status.HTTP_201_CREATED)
+
+        reviews = self.get_object().reviews.select_related('customer').all().order_by('-created_date')
+        p = paginators.DishPaginator()
+        page = p.paginate_queryset(reviews, request)
+        if page is not None:
+            serializer = serializers.ReviewSerializer(page, many=True)
+            return p.get_paginated_response(serializer.data)
+
+        return Response(serializers.ReviewSerializer(reviews, many=True).data, status=status.HTTP_200_OK)
+
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    permission_classes = [permissions.AllowAny]
+    pagination_class = None
 
 class UserViewSet(viewsets.ViewSet,generics.CreateAPIView):
     queryset = User.objects.filter(is_active = True)
     serializer_class = serializers.UserSerializer
+
     parser_classes = [parsers.MultiPartParser, parsers.JSONParser]
 
     @action(methods=['get', 'patch'], url_path='current-user',detail=False,permission_classes=[permissions.IsAuthenticated])
@@ -99,7 +128,12 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
     permission_classes =  [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return  Order.objects.filter(customer = self.request.user).order_by('-created_date')
+        user = self.request.user
+        if user.role == 'CHEF':
+            return Order.objects.filter(details__dish__chef=user).distinct().order_by('-created_date')
+        else:
+            return Order.objects.filter(customer=user).order_by('-created_date')
+
 
     @action(methods=['post'], detail=True, url_path='pay')
     def pay(self, request,pk):
@@ -128,7 +162,7 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
                 "message": f"Vui lòng truy cập đường dẫn để thanh toán qua {method}",
                 "payment_url": mock_payment_url,
                 "transaction_id": transaction.id,
-                "status": transaction.status  # Vẫn đang là PENDING
+                "status": transaction.status
             }, status=status.HTTP_200_OK)
         return Response({"error": "Phương thức thanh toán không hỗ trợ"}, status=status.HTTP_400_BAD_REQUEST)
 

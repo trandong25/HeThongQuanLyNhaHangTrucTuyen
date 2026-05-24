@@ -2,7 +2,8 @@ import { Alert, TouchableOpacity, View } from "react-native"
 import { Card,Icon,Text } from "react-native-paper"
 import Styles,{COLORS} from "../styles/Styles"
 import { useContext } from "react"
-import { CartContext } from "../configs/Contexts"
+import { CartContext, MyUserContext } from "../configs/Contexts"
+import { useNavigation } from "@react-navigation/native";
 
 
  export const formatPrice = (price) => {
@@ -10,21 +11,34 @@ import { CartContext } from "../configs/Contexts"
         return parseFloat(price).toLocaleString('vi-VN'); 
     }
 
-
 const FoodCard = ({item, onPress}) => {
     const [cart, dispatchCart] = useContext(CartContext);
-    
+    const [user, ] = useContext(MyUserContext);
+    const navigation = useNavigation();
+
     const handleAddToCart = () => {
-        dispatchCart({
-            type: "ADD_TO_CART",
-            payload: item
-        });
-        Alert.alert(`Đã thêm ${item.name} vào giỏ hàng`)
+        if (user === null) {
+            Alert.alert(
+                "Yêu cầu đăng nhập",
+                "Bạn cần đăng nhập để đặt món. Chuyển đến trang đăng nhập?",
+                [
+                    { text: "Để sau", style: "cancel" },
+                    {
+                        text: "Đăng nhập",
+                        onPress: () => navigation.navigate("MainTabs", { screen: "Tài khoản" })
+                    }
+                ]
+            );
+        } else {
+            dispatchCart({
+                type: "ADD_TO_CART",
+                payload: item
+            });
+            Alert.alert("Thông báo", `Đã thêm ${item.name} vào giỏ hàng`);
+        }
     }
     return (
-
-        
-         <TouchableOpacity style={Styles.cardWrapper} activeOpacity={0.8} onPress={onPress}>
+        <TouchableOpacity style={Styles.cardWrapper} activeOpacity={0.8} onPress={onPress}>
             <Card style={Styles.foodCard}>
                 <View style={{ position: 'relative' }}>
                     <Card.Cover
@@ -44,7 +58,6 @@ const FoodCard = ({item, onPress}) => {
                     <Text variant="bodySmall" style={Styles.foodChef}>
                         👨‍🍳 Đầu bếp {item.chef?.first_name || item.chef?.username || "Đồng"}
                     </Text>
-
                     
                     <View style={[Styles.row, Styles.metaContainer]}>
                         <View style={[Styles.row, Styles.metaItem]}>
@@ -63,8 +76,7 @@ const FoodCard = ({item, onPress}) => {
                         </Text>
 
                         <TouchableOpacity onPress={handleAddToCart} style={Styles.btnAddCart}>
-                            <Icon source="plus" size={20} color="white" /> 
-
+                            <Icon source="plus" size={20} color="white" />
                         </TouchableOpacity>
                     </View>
                 </Card.Content>

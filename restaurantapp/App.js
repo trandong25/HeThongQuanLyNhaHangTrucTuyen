@@ -16,11 +16,45 @@ import FoodDetail from "./screens/Home/FoodDetail";
 import { CartContext, MyUserContext } from "./configs/Contexts";
 import { CartReducer } from "./reducers/CartReducer";
 import Reservation from "./screens/Reservation/Reservation";
+import Order from "./screens/Order/Order";
+import ChefPending from "./screens/Chef/ChefPending";
+import ChefHome from "./screens/Chef/ChefHome";
+import AddDish from "./screens/Chef/AddDish";
 
 
 const Stack = createNativeStackNavigator(); 
 const Tab = createBottomTabNavigator();
 
+
+const ChefTabNavigator = () => {
+  return (
+    <Tab.Navigator screenOptions={{
+      headerShown: false,
+      tabBarActiveTintColor: '#E65100',
+      tabBarInactiveTintColor: 'gray'
+    }}>
+      <Tab.Screen 
+        name="Quản lý" 
+        component={ChefHome} 
+        options={{ tabBarIcon: ({color}) => <Icon source="food-fork-drink" size={26} color={color} />}}
+      />
+      <Tab.Screen 
+        name="Tài khoản" 
+        component={Profile} 
+        options={{ tabBarIcon: ({color}) => <Icon source="account-check" size={26} color={color} />}}
+      />
+    </Tab.Navigator>
+  )
+}
+
+const ChefRootStack = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ChefTabs" component={ChefTabNavigator} />
+      <Stack.Screen name="AddDish" component={AddDish} options={{ headerShown: true, title: "Cập nhật món" }}/>
+    </Stack.Navigator>
+  );
+}
 const HomeStackNavigator = () =>{
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
@@ -79,10 +113,23 @@ const TabNavigator = () => {
 }
 
 const RootNavigator = () => {
+  const [user, ] = useContext(MyUserContext);
+  
+  if (user && user.role === 'CHEF') {
+    if (user.is_approved === false) {
+      return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="PendingApproval" component={ChefPending} />
+        </Stack.Navigator>
+      );
+    }
+    return <ChefRootStack />;
+  }
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={TabNavigator} />
-      
+      <Stack.Screen name="Order" component={Order} />
       <Stack.Screen name="Reservation" component={Reservation} />
     </Stack.Navigator>
   );

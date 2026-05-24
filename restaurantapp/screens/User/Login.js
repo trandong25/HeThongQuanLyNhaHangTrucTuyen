@@ -108,6 +108,7 @@ const Login = () => {
             let u = await authApis(
                 res.data.access_token
             ).get(endpoints["current-user"]);
+            console.log('User data from API:', JSON.stringify(u.data, null, 2));
 
             // save context
             dispatch({
