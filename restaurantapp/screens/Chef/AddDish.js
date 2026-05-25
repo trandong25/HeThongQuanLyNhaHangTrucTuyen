@@ -1,24 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {
-    View,
-    Text,
-    TouchableOpacity,
-    Alert,
-    Image,
-    ScrollView,
-    StyleSheet,
-} from 'react-native';
-import {
-    TextInput,
-    HelperText,
-    Button,
-    Chip,
-} from 'react-native-paper';
+import {View, Text, TouchableOpacity, Alert, Image, ScrollView, StyleSheet} from 'react-native';
+import {TextInput,HelperText,Button,Chip} from 'react-native-paper';
 import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import * as ImgPicker from 'expo-image-picker';
 import Styles, { COLORS } from '../../styles/Styles';
-import APIs, { endpoints, authApis } from '../../configs/APIs';
+import APIs,{ endpoints, authApis } from '../../configs/APIs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddDish = ({ route, navigation }) => {
@@ -32,8 +19,6 @@ const AddDish = ({ route, navigation }) => {
         prep_time: '',
     });
     const [err, setErr] = useState(null);
-
-    // Dữ liệu danh mục và nguyên liệu
     const [categories, setCategories] = useState([]);
     const [ingredients, setIngredients] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -100,30 +85,35 @@ const AddDish = ({ route, navigation }) => {
     const handleIngredientsChange = async (selectedItems) => {
     const token = await AsyncStorage.getItem('token');
     const api = authApis(token);
-    const existingIds = [];
-    const newIds = [];
+    const finalIds = [];
 
     for (const item of selectedItems) {
-        if (typeof item.id === 'number') {
-            // Đã có trong database
-            existingIds.push(item.id);
+        const id = item?.id ?? item;
+        const name = item?.name;
+
+        // Nếu id là số và có trong danh sách ingredients hiện tại -> đã tồn tại
+        if (typeof id === 'number' && ingredients.some(ing => ing.id === id)) {
+            finalIds.push(id);
         } else {
-            // Nguyên liệu mới nhập tay: id là chuỗi (tên nguyên liệu)
+            // Nguyên liệu mới: lấy tên từ id (nếu id là chuỗi) hoặc từ item.name
+            const ingredientName = typeof id === 'string' ? id : name;
+            if (!ingredientName) continue;
+
             try {
-                const res = await api.post('/ingredients/', { name: item.name });
-                newIds.push(res.data.id);
-                // Thêm vào state ingredients để hiển thị Chip và dùng sau
-                setIngredients(prev => [...prev, { id: res.data.id, name: item.name }]);
+                const res = await api.post('/ingredients/', { name: ingredientName });
+                finalIds.push(res.data.id);
+                // Cập nhật state ingredients để hiển thị và dùng sau
+                setIngredients(prev => [...prev, { id: res.data.id, name: ingredientName }]);
             } catch (ex) {
                 console.error('Lỗi tạo nguyên liệu:', ex);
-                Alert.alert('Lỗi', `Không thể tạo nguyên liệu "${item.name}"`);
+                Alert.alert('Lỗi', `Không thể tạo nguyên liệu "${ingredientName}"`);
             }
         }
     }
 
-    // Cập nhật danh sách đã chọn (chỉ chứa ID số)
-    setSelectedIngredients([...existingIds, ...newIds]);
+    setSelectedIngredients(finalIds);
 };
+
     // Validate
     const validate = () => {
         if (!dish.name || !dish.price || !dish.prep_time) {
@@ -283,7 +273,7 @@ const AddDish = ({ route, navigation }) => {
                     selectedTextStyle={styles.selectedTextStyle}
                     search
                     searchPlaceholder="Tìm nguyên liệu..."
-                    // Cho phép thêm mới
+                    visibleSelectedItem={false}
                     allowCreate={true}
                     onCreate={(name) => ({ id: name, name: name })}
                 />

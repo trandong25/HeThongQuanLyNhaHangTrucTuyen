@@ -39,6 +39,7 @@ const Login = () => {
     const [user, setUser] = useState({});
     const [err, setErr] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const nav = useNavigation();
 
@@ -116,8 +117,6 @@ const Login = () => {
                 payload: u.data,
             });
 
-            nav.navigate("Trang chủ");
-
         } catch (ex) {
 
             console.error(ex.response?.data);
@@ -131,27 +130,15 @@ const Login = () => {
             setLoading(false);
         }
     };
-
     return (
-        <ScrollView
-            contentContainerStyle={[
-                Styles.container,
-                Styles.center,
-            ]}
-            showsVerticalScrollIndicator={false}
-        >
-
-            {/* Title */}
-            <Text style={Styles.title}>
-                Chào mừng trở lại 👋
-            </Text>
-
-            <Text style={Styles.subtitle}>
-                Đăng nhập để khám phá hôm nay
-            </Text>
-
-            {/* Tabs */}
-            <View style={Styles.tabContainer}>
+    <ScrollView
+        style={Styles.container}
+        contentContainerStyle={[Styles.scrollContent, Styles.center]}
+        showsVerticalScrollIndicator={false}
+    >
+        <Text style={Styles.title}>Chào mừng trở lại 👋</Text>
+        <Text style={Styles.subtitle}>Đăng nhập để khám phá hôm nay</Text>
+        <View style={Styles.tabContainer}>
 
                 <View style={Styles.activeTab}>
                     <Text style={Styles.activeTabText}>
@@ -214,31 +201,28 @@ const Login = () => {
             }
 
             {/* Inputs */}
-            {
-                userInfo.map((i) => (
-                    <TextInput
-                        key={i.field}
-                        style={Styles.input}
-                        value={user[i.field]}
-                        onChangeText={(t) =>
-                            setUser({
-                                ...user,
-                                [i.field]: t,
-                            })
-                        }
-                        label={i.label}
-                        secureTextEntry={
-                            i.secureTextEntry
-                        }
-                        mode="outlined"
-                        right={
+            {userInfo.map((i) => (
+                <TextInput
+                    key={i.field}
+                    style={Styles.input}
+                    value={user[i.field]}
+                    onChangeText={(t) => setUser({ ...user, [i.field]: t })}
+                    label={i.label}
+                    secureTextEntry={i.field === "password" && !showPassword}
+                    mode="outlined"
+                    outlineStyle={Styles.inputOutline}
+                    right={
+                        i.field === "password" ? (
                             <TextInput.Icon
-                                icon={i.icon}
+                                icon={showPassword ? "eye-off" : "eye"}
+                                onPress={() => setShowPassword(!showPassword)}
                             />
-                        }
-                    />
-                ))
-            }
+                        ) : (
+                            <TextInput.Icon icon={i.icon} />
+                        )
+                    }
+                />
+            ))}
 
             {/* Forgot */}
             <Text style={Styles.forgot}>
@@ -255,9 +239,10 @@ const Login = () => {
             >
                 Đăng nhập
             </Button>
+        
+    </ScrollView>
+);
 
-        </ScrollView>
-    );
 };
 
 export default Login;

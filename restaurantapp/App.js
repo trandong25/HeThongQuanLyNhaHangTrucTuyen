@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Icon } from 'react-native-paper';
 import Home from "./screens/Home/Home";
-import Search from "./screens/Search/Search";
+import Search from "./screens/Search/SearchScreen";
 import Cart from "./screens/Cart/Cart";
 import Chat from "./screens/Chat/Chat";
 import Profile from "./screens/User/Profile";
@@ -16,6 +16,7 @@ import FoodDetail from "./screens/Home/FoodDetail";
 import { CartContext, MyUserContext } from "./configs/Contexts";
 import { CartReducer } from "./reducers/CartReducer";
 import Reservation from "./screens/Reservation/Reservation";
+import SearchScreen from "./screens/Search/SearchScreen";
 import Order from "./screens/Order/Order";
 import ChefPending from "./screens/Chef/ChefPending";
 import ChefHome from "./screens/Chef/ChefHome";
@@ -33,14 +34,14 @@ const ChefTabNavigator = () => {
       tabBarActiveTintColor: '#E65100',
       tabBarInactiveTintColor: 'gray'
     }}>
-      <Tab.Screen 
-        name="Quản lý" 
-        component={ChefHome} 
+      <Tab.Screen
+        name="Quản lý"
+        component={ChefHome}
         options={{ tabBarIcon: ({color}) => <Icon source="food-fork-drink" size={26} color={color} />}}
       />
-      <Tab.Screen 
-        name="Tài khoản" 
-        component={Profile} 
+      <Tab.Screen
+        name="Tài khoản"
+        component={Profile}
         options={{ tabBarIcon: ({color}) => <Icon source="account-check" size={26} color={color} />}}
       />
     </Tab.Navigator>
@@ -59,7 +60,9 @@ const HomeStackNavigator = () =>{
   return(
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="index" component={Home}/>
-      <Stack.Screen name="food-detail" component={FoodDetail} 
+      <Stack.Screen name="SearchScreen" component={SearchScreen}
+                options={{ headerShown: true, title: "Tìm kiếm món ăn" }}/>
+      <Stack.Screen name="food-detail" component={FoodDetail}
                   options={{ headerShown:true ,title:"Chi tiết món ăn"}} />
     </Stack.Navigator>
   )
@@ -114,7 +117,7 @@ const TabNavigator = () => {
 
 const RootNavigator = () => {
   const [user, ] = useContext(MyUserContext);
-  
+
   if (user && user.role === 'CHEF') {
     if (user.is_approved === false) {
       return (

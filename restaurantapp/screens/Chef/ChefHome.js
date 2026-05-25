@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import Styles, { COLORS } from '../../styles/Styles'; 
-import APIs, { endpoints, authApi } from '../../configs/APIs'; 
+import APIs, { endpoints, authApis } from '../../configs/APIs'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
 
@@ -26,8 +26,9 @@ const ChefHome = () => {
         }
     };
     useEffect(() => {
-        loadDishes();
-    }, []);
+            const unsubscribe = navigation.addListener('focus', loadDishes);
+            return unsubscribe;
+        }, [navigation]);
 
     const handleDelete = (id) => {
         Alert.alert(
@@ -46,7 +47,7 @@ const ChefHome = () => {
                                 return;
                             }
                             
-                            await authApi(token).delete(`${endpoints['dishes']}${id}/`);
+                            await authApis(token).delete(`${endpoints['dishes']}${id}/`);
                             Alert.alert("Thành công", "Đã xóa món ăn!");
                             
                             loadDishes(); 

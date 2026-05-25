@@ -49,7 +49,7 @@ const Profile = () => {
                         description="Theo dõi trạng thái đặt bàn của bạn"
                         left={props => <List.Icon {...props} icon="calendar-clock" color={COLORS.primary} />}
                         right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => nav.navigate("MyReservations")}
+                        onPress={() => nav.navigate("Reservation")}
                     />
                     <Divider />
                     <List.Item
