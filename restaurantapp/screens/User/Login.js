@@ -1,4 +1,4 @@
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useContext, useState } from "react";
 
 import {
@@ -62,70 +62,55 @@ const Login = () => {
 
     // login
     const login = async () => {
-
-        if (validate() === false)
-            return;
+        if (validate() === false) return;
 
         try {
-
             setLoading(true);
             setErr("");
 
-            let form = new FormData();
-
-            form.append("username", user.username);
-            form.append("password", user.password);
-
-            form.append(
-                "client_id",
-                "fUgCfLWbqR5edVtzCAmdLnzRIRDOyRuTXZgBsoFs"
-            );
-
-            form.append(
-                "client_secret",
-                "0GWzA6QwVapaEK7jtSnU5n8GGfeFKGjc5j7vhrb4ZRBdDwcCMukx9IRetqWroVc2l55jN8Tai0KhbnJ9qZoqCftxzb2LWSlNhwuKrhreyVf5RTcKZMCwbh82LFivO4wB"
-            );
-
-            form.append("grant_type", "password");
-
-            let res = await Apis.post(
-                endpoints["login"],
-                form,
-                {
-                    headers: {
-                        "Content-Type":
-                            "multipart/form-data",
-                    },
-                }
-            );
-
-            // save token
-            await AsyncStorage.setItem(
-                "token",
-                res.data.access_token
-            );
-
-            // current user
-            let u = await authApis(
-                res.data.access_token
-            ).get(endpoints["current-user"]);
-            console.log('User data from API:', JSON.stringify(u.data, null, 2));
-
-            // save context
-            dispatch({
-                type: "LOGIN",
-                payload: u.data,
+            let res = await Apis.post(endpoints["login-proxy"], {
+                username: user.username,
+                password: user.password,
+                grant_type: "password",
             });
 
+            const accessToken = res.data.access_token;
+
+            // Lấy thông tin user
+            let u = await authApis(accessToken).get(endpoints["current-user"]);
+            const loggedInUser = u.data;
+
+            // Kiểm tra chef chưa được duyệt
+            if (loggedInUser.role === 'CHEF' && !loggedInUser.is_approved) {
+                Alert.alert("Thông báo", "🔒 Tài khoản Đầu bếp đang chờ Admin phê duyệt!");
+                return; 
+            }
+
+            // Lưu token
+            await AsyncStorage.setItem("token", accessToken);
+
+            Alert.alert("Thành công", "🎉 Đăng nhập thành công!");
+            nav.navigate("Home");
+
+            // Dispatch — context tự chuyển màn hình
+            dispatch({ type: "LOGIN", payload: loggedInUser });
+             const pending = await AsyncStorage.getItem('pendingPayment');
+            if (pending) {
+                await AsyncStorage.removeItem('pendingPayment'); // Xóa sau khi lấy
+                const params = JSON.parse(pending);
+                // Chuyển về Payment với params đã lưu
+                nav.navigate('Reservation', {
+                    screen: 'Payment',
+                    params: params,
+                });
+            }
+
         } catch (ex) {
-
             console.error(ex.response?.data);
-
             if (ex.response?.status === 400)
                 setErr("Sai tài khoản hoặc mật khẩu!");
             else
                 setErr("Không thể kết nối server!");
-
         } finally {
             setLoading(false);
         }

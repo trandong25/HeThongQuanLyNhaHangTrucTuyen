@@ -77,7 +77,8 @@ class Reservation(BaseModel):
     RESERVATION_STATUS = [
         ('PENDING', 'Chờ duyệt'),
         ('CONFIRMED', 'Đã xác nhận'),
-        ('CANCELLED', 'Đã hủy')
+        ('CANCELLED', 'Đã hủy'),
+        ('DONE', 'Đã hoàn thành')
     ]
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reservations')
     table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True,blank=True)

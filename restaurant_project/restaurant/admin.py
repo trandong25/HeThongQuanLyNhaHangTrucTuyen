@@ -88,7 +88,6 @@ class MyAdminSite(admin.AdminSite):
             'category_stats': category_stats,
             'revenue_stats': revenue_stats
         })
-    
 
 admin_site = MyAdminSite()
 

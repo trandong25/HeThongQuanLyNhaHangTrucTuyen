@@ -14,6 +14,10 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import CompareDishSerializer, ReviewSerializer, IngredientSerializer
 from django.db.models import  Sum, Avg, F
 from .serializers import DishSerializer
+import requests
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.conf import settings
 
 
 class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
@@ -36,7 +40,7 @@ class DishViewSet(viewsets.ModelViewSet):
         queryset = Dish.objects.filter(active = True).order_by('-id')
         q =self.request.query_params.get('q')
         if q:
-            queryset = queryset.filter(name__contains=q   )
+            queryset = queryset.filter(name__icontains=q   )
         category_id =   self.request.query_params.get('category_id')
         if category_id:
             queryset = queryset.filter(category_id=category_id)
@@ -126,8 +130,6 @@ class ReviewViewSet(viewsets.ViewSet,generics.DestroyAPIView, generics.UpdateAPI
             return [perms.IsReviewOwner()]
         return [permissions.IsAuthenticatedOrReadOnly()]
 
-
-
 class ReservationViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView):
     serializer_class = serializers.ReservationSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -163,6 +165,11 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
             amount = order.total_amount,
             payment_method = method
         )
+
+        if order.reservation:
+            order.reservation.status = 'CONFIRMED'
+            order.reservation.save()
+
         if method == 'CASH':
             transaction.status = 'PENDING'
             transaction.save()
@@ -179,6 +186,7 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
                 "transaction_id": transaction.id,
                 "status": transaction.status
             }, status=status.HTTP_200_OK)
+
         return Response({"error": "Phương thức thanh toán không hỗ trợ"}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post', 'get'], url_path='reviews', detail=True)
@@ -272,4 +280,31 @@ class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = serializers.TransactionSerializer
     permission_classes = [IsAuthenticated]
+
+
+
+
+
+@api_view(['POST'])
+def login_proxy(request):
+
+    username = request.data.get("username")
+    password = request.data.get("password")
+    token_url=request.build_absolute_uri("/o/token/")
+
+    payload = {
+        "username": username,
+        "password": password,
+        "client_id": settings.CLIENT_ID,
+        "client_secret": settings.CLIENT_SECRET,
+        "grant_type": "password"
+    }
+    print("👉 URL GỌI ĐẾN:", token_url)
+    print("👉 PAYLOAD GỬI ĐI:", payload)
+
+    res = requests.post(token_url, data=payload)
+    print("👉 KẾT QUẢ TỪ OAUTH2:", res.text)
+
+    return Response(res.json(), status=res.status_code)
+
 

@@ -18,9 +18,10 @@ import { CartReducer } from "./reducers/CartReducer";
 import Reservation from "./screens/Reservation/Reservation";
 import SearchScreen from "./screens/Search/SearchScreen";
 import Order from "./screens/Order/Order";
-import ChefPending from "./screens/Chef/ChefPending";
 import ChefHome from "./screens/Chef/ChefHome";
 import AddDish from "./screens/Chef/AddDish";
+import Payment from "./screens/Payment/Payment";
+import MyReservations from "./screens/Reservation/MyReservation";
 
 
 const Stack = createNativeStackNavigator(); 
@@ -62,7 +63,7 @@ const HomeStackNavigator = () =>{
       <Stack.Screen name="index" component={Home}/>
       <Stack.Screen name="SearchScreen" component={SearchScreen}
                 options={{ headerShown: true, title: "Tìm kiếm món ăn" }}/>
-      <Stack.Screen name="food-detail" component={FoodDetail}
+      <Stack.Screen name="food-detail" component={FoodDetail} 
                   options={{ headerShown:true ,title:"Chi tiết món ăn"}} />
     </Stack.Navigator>
   )
@@ -119,13 +120,6 @@ const RootNavigator = () => {
   const [user, ] = useContext(MyUserContext);
 
   if (user && user.role === 'CHEF') {
-    if (user.is_approved === false) {
-      return (
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="PendingApproval" component={ChefPending} />
-        </Stack.Navigator>
-      );
-    }
     return <ChefRootStack />;
   }
 
@@ -134,6 +128,8 @@ const RootNavigator = () => {
       <Stack.Screen name="MainTabs" component={TabNavigator} />
       <Stack.Screen name="Order" component={Order} />
       <Stack.Screen name="Reservation" component={Reservation} />
+      <Stack.Screen name="MyReservations" component={MyReservations} />
+      <Stack.Screen name="Payment" component={Payment} />
     </Stack.Navigator>
   );
 }

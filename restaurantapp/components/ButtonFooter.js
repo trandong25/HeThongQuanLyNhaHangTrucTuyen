@@ -2,12 +2,14 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { COLORS } from '../styles/Styles';
 import { formatPrice } from '../components/FoodCard'; 
+import { ActivityIndicator } from 'react-native-paper';
 
 const CheckoutFooter = ({
     totalAmount,
     onPress,
     buttonText = 'Thanh toán',
     disabled = false,
+    loading = false,
 }) => {
     return (
         <View style={styles.container}>
@@ -18,7 +20,12 @@ const CheckoutFooter = ({
                 disabled={disabled}
             >
                 <Text style={styles.text}>{buttonText}</Text>
-                <Text style={styles.text}>{formatPrice(totalAmount)}đ</Text>
+                
+                {loading ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                    <Text style={styles.text}>{formatPrice(totalAmount)}đ</Text>
+                )}            
             </TouchableOpacity>
         </View>
     );

@@ -17,7 +17,7 @@ const Profile = () => {
             { 
                 text: "Đăng xuất", 
                 onPress: async () => {
-                    await AsyncStorage.removeItem("access_token");
+                    await AsyncStorage.removeItem("token");
                     dispatchUser({ type: "LOGOUT" });
                 },
                 style: "destructive"
@@ -39,7 +39,7 @@ const Profile = () => {
                         {user?.first_name} {user?.last_name}
                     </Text>
                     <Text style={{ fontSize: 14, color: 'gray', marginTop: 5 }}>
-                        @{user?.username} | Vai trò: {user?.role}
+                         Vai trò: {user?.role}
                     </Text>
                 </View>
 
@@ -49,7 +49,7 @@ const Profile = () => {
                         description="Theo dõi trạng thái đặt bàn của bạn"
                         left={props => <List.Icon {...props} icon="calendar-clock" color={COLORS.primary} />}
                         right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => nav.navigate("Reservation")}
+                        onPress={() => nav.navigate("MyReservations")}
                     />
                     <Divider />
                     <List.Item
@@ -65,18 +65,19 @@ const Profile = () => {
                         description="Hỗ trợ, tư vấn trực tiếp"
                         left={props => <List.Icon {...props} icon="chat-processing-outline" color="#03A9F4" />}
                         right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => nav.navigate("Chat")} 
+                        onPress={() => nav.navigate("Chat")}
                     />
+                    
                 </View>
-
-                <Button 
+                    <Button 
                     mode="contained" 
-                    buttonColor="#FF3B30" 
+                    buttonColor="#fa5b52" 
                     style={{ marginTop: 30, paddingVertical: 5, borderRadius: 10 }}
                     onPress={handleLogout}
                 >
                     Đăng xuất
                 </Button>
+                
             </ScrollView>
         </View>
     );

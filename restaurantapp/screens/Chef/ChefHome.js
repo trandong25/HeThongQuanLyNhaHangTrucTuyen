@@ -63,16 +63,16 @@ const ChefHome = () => {
 
 
     const renderItem = ({ item }) => (
-        <View style={[Styles.row, Styles.cartItem, Styles.between]}>
-            <Image source={{ uri: item.image }} style={{ width: 60, height: 60, borderRadius: 10 }} />
+        <View style={[Styles.row, Styles.cartItem, Styles.between, { padding: 15, marginHorizontal: 10 }]}>
+            <Image source={{ uri: item.image }} style={{ width: 60, height: 60, borderRadius: 10, }} />
             
-            <View style={{ flex: 1, paddingHorizontal: 10 }}>
+            <View style={{ flex: 1, paddingHorizontal: 15 }}>
                 <Text style={Styles.foodName} numberOfLines={1}>{item.name}</Text>
                 <Text style={Styles.priceText}>{item.price} VNĐ</Text>
             </View>
 
             <TouchableOpacity
-                style={[Styles.btnAddCart, { backgroundColor: COLORS.warning, marginRight: 5, width: 45, borderRadius: 8 }]}
+                style={[Styles.btnAddCart, { backgroundColor: COLORS.warning, marginRight: 8, width: 45, borderRadius: 8 }]}
                 onPress={() => navigation.navigate('AddDish', { dishId: item.id })}
             >
                 <Text style={{ color: '#000', fontWeight: 'bold' }}>Sửa</Text>
@@ -88,7 +88,7 @@ const ChefHome = () => {
     );
     return (
         <View style={Styles.container}>
-            <Text style={[Styles.subject, Styles.mb, { marginTop: 30 }]}>Quản lý Thực Đơn</Text>
+            <Text style={[Styles.subject, Styles.mb, {marginTop: 30, textAlign: 'center'}]}>Quản lý Thực Đơn</Text>
             
             <TouchableOpacity
                 style={[Styles.btnCate, Styles.padding, Styles.bradius, Styles.mb, { alignItems: 'center' }]}
@@ -104,6 +104,7 @@ const ChefHome = () => {
                     data={dishes}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={renderItem}
+                    contentContainerStyle={{ paddingVertical: 10 }}
                     ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20 }}>Chưa có món ăn nào.</Text>}
                 />
             )}

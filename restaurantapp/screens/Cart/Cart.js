@@ -79,6 +79,7 @@ const Cart = () => {
                     <CheckoutFooter
                         totalAmount={totalAmount}
                         buttonText="Tiến hành đặt bàn"
+                        loading={false}
                         onPress={() => nav.navigate('Reservation')}
                     />
                 </>

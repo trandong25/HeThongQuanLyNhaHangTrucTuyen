@@ -44,7 +44,6 @@ const AddDish = ({ route, navigation }) => {
         fetchData();
     }, []);
 
-    // Load chi tiết món nếu là sửa
     useEffect(() => {
         if (dishId) {
             const loadDish = async () => {
@@ -180,7 +179,7 @@ const AddDish = ({ route, navigation }) => {
 
     // Render item cho Dropdown
     const renderItem = (item) => (
-        <View style={styles.item}>
+        <View style={Styles.item}>
             <Text style={styles.textItem}>{item.name}</Text>
             {item.id === selectedCategory && (
                 <AntDesign name="check" size={20} color={COLORS.primary} />
@@ -248,7 +247,7 @@ const AddDish = ({ route, navigation }) => {
                 {/* Danh mục */}
                 <Text style={{ marginTop: 10, marginBottom: 5, fontWeight: 'bold' }}>Danh mục:</Text>
                 <Dropdown
-                    style={styles.dropdown}
+                    style={Styles.dropdown}
                     data={categories}
                     labelField="name"
                     valueField="id"
@@ -256,13 +255,13 @@ const AddDish = ({ route, navigation }) => {
                     value={selectedCategory}
                     onChange={item => setSelectedCategory(item.id)}
                     renderItem={renderItem}
-                    selectedTextStyle={styles.selectedTextStyle}
+                    selectedTextStyle={Styles.selectedTextStyle}
                 />
 
                 {/* Nguyên liệu (MultiSelect có thể thêm mới) */}
                 <Text style={{ marginTop: 15, marginBottom: 5, fontWeight: 'bold' }}>Nguyên liệu:</Text>
                 <MultiSelect
-                    style={styles.dropdown}
+                    style={Styles.dropdown}
                     data={ingredients}
                     labelField="name"
                     valueField="id"
@@ -270,7 +269,7 @@ const AddDish = ({ route, navigation }) => {
                     value={selectedIngredients}
                     onChange={handleIngredientsChange}
                     renderItem={renderMultiItem}
-                    selectedTextStyle={styles.selectedTextStyle}
+                    selectedTextStyle={Styles.selectedTextStyle}
                     search
                     searchPlaceholder="Tìm nguyên liệu..."
                     visibleSelectedItem={false}
@@ -285,7 +284,8 @@ const AddDish = ({ route, navigation }) => {
                         return ing ? (
                             <Chip
                                 key={id}
-                                onClose={() => setSelectedIngredients(prev => prev.filter(i => i !== id))}
+                                onClose={
+                                    () => setSelectedIngredients(prev => prev.filter(i => i !== id))}
                                 style={{ margin: 2 }}
                             >
                                 {ing.name}
@@ -335,29 +335,5 @@ const AddDish = ({ route, navigation }) => {
     );
 };
 
-const styles = StyleSheet.create({
-    dropdown: {
-        marginVertical: 8,
-        backgroundColor: '#f5f5f5',
-        borderRadius: 10,
-        paddingHorizontal: 15,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        height: 50,
-    },
-    item: {
-        padding: 15,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    textItem: {
-        flex: 1,
-        fontSize: 16,
-    },
-    selectedTextStyle: {
-        fontSize: 16,
-    },
-});
 
 export default AddDish;

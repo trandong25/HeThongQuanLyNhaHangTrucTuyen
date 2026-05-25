@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import Styles from "../../styles/Styles"; // Đảm bảo đường dẫn này đúng
+import Styles from "../../styles/Styles"; 
 
 const Chat = () => {
     return (

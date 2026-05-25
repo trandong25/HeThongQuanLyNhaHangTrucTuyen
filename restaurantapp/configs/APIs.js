@@ -1,4 +1,5 @@
 import axios from "axios";
+// Doi ip
 const BASE_URL = "http://10.60.250.82:8000/";
 
 export const endpoints = {
@@ -11,8 +12,10 @@ export const endpoints = {
     'dish-detail':  (foodId) => `/dishes/${foodId}/`,
     'dish-reviews': (foodId) => `/dishes/${foodId}/reviews/`,
     'reservations': "/reservations/",
-    'orders': '/orders/',
+    'orders':       '/orders/',
     'order-detail': (orderId) => `/orders/${orderId}/`,
+    'order-pay':    (id) => `/orders/${id}/pay/`,
+    "login-proxy": "/login-proxy/",
     'ingredients': '/ingredients/',
 };
 

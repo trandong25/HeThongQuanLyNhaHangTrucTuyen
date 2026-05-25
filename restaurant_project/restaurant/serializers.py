@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import User,Category,Dish,Review,Ingredient,Transaction
 from .models import Table,Reservation, OrderDetail, Order
 from django.db.models import Avg
+from datetime import timedelta
 
 
 
@@ -40,13 +41,25 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'avatar', 'role', 'is_approved']
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'avatar', 'role','is_approved']
         extra_kwargs = {
             'password': {'write_only': True}
         }
 
     def create(self, validated_data):
-        user = User(**validated_data)
+        role = validated_data.get('role','CUSTOMER')
+        if role == 'CHEF':
+            is_approved = False
+        else:
+            is_approved = True
+        user = User(
+            username=validated_data['username'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
+            avatar=validated_data.get('avatar'),  # Ảnh đại diện của bạn
+            role=role,
+            is_approved=is_approved
+        )
         user.set_password(validated_data['password'])
         user.save()
         return user
@@ -77,6 +90,7 @@ class ReservationSerializer(serializers.ModelSerializer):
     customer_name = serializers.StringRelatedField(source='customer', read_only=True)
     table_info = TableSerializer(source='table', read_only=True)
 
+
     class Meta:
         model = Reservation
         fields = ['id', 'customer', 'customer_name','table', 'table_info', 'reservation_time', 'number_of_people', 'status','created_date']
@@ -90,18 +104,17 @@ class ReservationSerializer(serializers.ModelSerializer):
         people = validated_data['number_of_people']
         time = validated_data['reservation_time']
 
+        start = time - timedelta(minutes=90)
+        end = time + timedelta(minutes=90)
+
         busy_tables = Reservation.objects.filter(
-            reservation_time=time
-        ).exclude(
-            status='CANCELLED'
+            reservation_time__gte=start,
+            reservation_time__lte=end,
+            status__in=['PENDING', 'CONFIRMED']
         ).values_list('table_id', flat=True)
 
-        table = Table.objects.filter(
-            is_available=True,
-            capacity__gte=people
-        ).exclude(
-            id__in=busy_tables
-        ).order_by('capacity').first()
+        table = (Table.objects.filter(is_available=True,capacity__gte=people)
+                 .exclude(id__in=busy_tables).order_by('capacity').first())
 
         if not table:
             raise serializers.ValidationError(
@@ -111,19 +124,22 @@ class ReservationSerializer(serializers.ModelSerializer):
 
         return super().create(validated_data)
 class OrderDetailSerializer(serializers.ModelSerializer):
+    dish_name = serializers.CharField(source='dish.name', read_only=True)
+
     class Meta:
         model = OrderDetail
-        fields = ['id', 'dish', 'quantity', 'unit_price']
+        fields = ['id', 'dish', 'dish_name', 'quantity', 'unit_price']
         extra_kwargs = {
-            'unit_price': {'read_only':True}
+            'unit_price': {'read_only': True}
         }
 
 class OrderSerializer(serializers.ModelSerializer):
     order_details = OrderDetailSerializer(many = True, write_only=True)
+    details = OrderDetailSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id','customer','status','total_amount','created_date','order_details', 'reservation']
+        fields = ['id', 'customer', 'status', 'total_amount', 'created_date', 'order_details', 'details', 'reservation']
         extra_kwargs = {
             'customer': {'read_only': True},
             'status': {'read_only': True},
@@ -179,210 +195,6 @@ class DishSerializer(serializers.ModelSerializer):
             data['image'] = instance.image.url
         return data
     
-class TransactionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Transaction
-        fields = [
-            'id', 'order', 'amount',
-            'payment_method', 'status',
-            'transaction_code', 'created_date'
-        ]
-        read_only_fields = ['status', 'transaction_code']
-
-class DishSearchSerializer(serializers.ModelSerializer):
-    avg_rating = serializers.FloatField()
-    class Meta:
-        model = Dish
-        fields = [
-            'id', 'name', 'price',
-            'prep_time', 'avg_rating'
-        ]
-
-
-
-
-
-from rest_framework import serializers
-from .models import User,Category,Dish,Review,Ingredient,Transaction
-from .models import Table,Reservation, OrderDetail, Order
-from django.db.models import Avg
-
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
-
-class IngredientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ingredient
-        fields = ['id', 'name']
-
-class CompareDishSerializer(serializers.ModelSerializer):
-    avg_rating = serializers.SerializerMethodField()
-    ingredients = serializers.SerializerMethodField()
-    class Meta:
-        model = Dish
-        fields = ['id', 'name', 'price', 'category', 'prep_time', 'image', 'ingredients', 'avg_rating']
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['ingredients'] = IngredientSerializer(instance.ingredients.all(), many=True).data
-
-        if instance.image:
-            data['image'] = instance.image.url
-        return data
-    def get_avg_rating(self, obj):
-        return round(obj.reviews.aggregate(avg=Avg('rating'))['avg'] or 0, 1)
-    def get_ingredients(self, obj):
-        return [i.name for i in obj.ingredients.all()]
-
-
-
-class UserSerializer(serializers.ModelSerializer):
-    avatar = serializers.ImageField(required=False)
-
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'avatar', 'role', 'is_approved']
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
-
-    def create(self, validated_data):
-        user = User(**validated_data)
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
-
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = ['id', 'rating', 'comment', 'created_date', 'customer', 'dish']
-        extra_kwargs = {
-            'customer': {'read_only': True}
-        }
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['customer'] = UserSerializer(instance.customer).data
-        return data
-    def validate_rating(self, value):
-        if value < 1 or value > 5:
-            raise serializers.ValidationError("Rating must be between 1 and 5")
-        return value
-
-
-class TableSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Table
-        fields = ['id','table_number', 'capacity']
-
-class ReservationSerializer(serializers.ModelSerializer):
-    customer_name = serializers.StringRelatedField(source='customer', read_only=True)
-    table_info = TableSerializer(source='table', read_only=True)
-
-    class Meta:
-        model = Reservation
-        fields = ['id', 'customer', 'customer_name','table', 'table_info', 'reservation_time', 'number_of_people', 'status','created_date']
-        extra_kwargs = {
-            'customer': {'read_only':True},
-            'status' : {'read_only':True},
-            'table': {'read_only': True}
-        }
-
-    def create(self, validated_data):
-        people = validated_data['number_of_people']
-        time = validated_data['reservation_time']
-
-        busy_tables = Reservation.objects.filter(
-            reservation_time=time
-        ).exclude(
-            status='CANCELLED'
-        ).values_list('table_id', flat=True)
-
-        table = Table.objects.filter(
-            is_available=True,
-            capacity__gte=people
-        ).exclude(
-            id__in=busy_tables
-        ).order_by('capacity').first()
-
-        if not table:
-            raise serializers.ValidationError(
-                "Hiện tại nhà hàng không còn bàn trống phù hợp với số lượng khách vào khung giờ này!")
-
-        validated_data['table'] = table
-
-        return super().create(validated_data)
-class OrderDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderDetail
-        fields = ['id', 'dish', 'quantity', 'unit_price']
-        extra_kwargs = {
-            'unit_price': {'read_only':True}
-        }
-
-class OrderSerializer(serializers.ModelSerializer):
-    order_details = OrderDetailSerializer(many = True, write_only=True)
-
-    class Meta:
-        model = Order
-        fields = ['id','customer','status','total_amount','created_date','order_details', 'reservation']
-        extra_kwargs = {
-            'customer': {'read_only': True},
-            'status': {'read_only': True},
-            'total_amount': {'read_only': True}
-        }
-
-    def create(self, validated_data):
-        details_data = validated_data.pop('order_details')
-
-        #request = self.context.get('request'), request.user
-        user = self.context['request'].user
-        order = Order.objects.create(customer=user, **validated_data)
-
-        total = 0
-        for detail in details_data:
-            dish = detail['dish']
-            quantity = detail['quantity']
-            unit_price = dish.price
-            total += unit_price*quantity
-
-            OrderDetail.objects.create(
-                order=order,
-                dish =dish,
-                quantity = quantity,
-                unit_price = unit_price
-            )
-        order.total_amount = total
-        order.save()
-
-        return order
-
-class DishSerializer(serializers.ModelSerializer):
-    ingredients = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Ingredient.objects.all()
-    )
-    chef = UserSerializer(read_only=True)
-    avg_rating = serializers.FloatField(read_only=True)
-    class Meta:
-        model = Dish
-        fields = [
-            'id', 'name', 'description', 'image',
-            'price', 'ingredients', 'prep_time',
-            'chef', 'category', 'avg_rating',
-            'created_date'
-        ]
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['ingredients'] = IngredientSerializer(instance.ingredients.all(), many=True).data
-
-        if instance.image:
-            data['image'] = instance.image.url
-        return data
-
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
