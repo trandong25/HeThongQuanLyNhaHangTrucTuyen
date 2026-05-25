@@ -345,6 +345,29 @@ cartItem: {
         textAlign: 'center',
          marginTop: 30, 
          color: '#999', 
-         fontStyle: 'italic' }
+         fontStyle: 'italic' },
+    card: { borderRadius: 12, marginBottom: 12, elevation: 2, backgroundColor: '#fff' },
+    itemRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
+    totalLabel: { fontWeight: 'bold', fontSize: 15 },
+    totalAmount: { fontWeight: 'bold', fontSize: 17, color: '#E65100' },
+    label: { color: '#666', width: 110 },
+    value: { fontWeight: '600', flex: 1, textAlign: 'right' },
+    methodRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10 },
+    methodLabel: { fontWeight: '600', fontSize: 14 },
+    methodDesc: { color: '#888', fontSize: 12, marginTop: 2 },
+    comingSoon: { color: '#999', fontSize: 11, fontStyle: 'italic' },
+    footer: {
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        backgroundColor: '#E65100', padding: 16,
+        borderTopLeftRadius: 20, borderTopRightRadius: 20,
+    },
+    footerTotal: {
+        flexDirection: 'row', justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    footerAmount: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
+    confirmBtn: { borderRadius: 10 },
+
+
 
 });

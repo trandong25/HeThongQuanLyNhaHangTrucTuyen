@@ -5,6 +5,8 @@ from django.db.models import Avg
 
 
 
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -40,13 +42,24 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'avatar', 'role']
+        fields = ['id', 'username', 'password', 'first_name', 'last_name', 'avatar', 'role','is_approved']
         extra_kwargs = {
             'password': {'write_only': True}  # Bảo mật: Mật khẩu chỉ được phép gửi lên để lưu, cấm trả về khi GET
         }
-
     def create(self, validated_data):
-        user = User(**validated_data)
+        role = validated_data.get('role','CUSTOMER')
+        if role == 'CHEF':
+            is_approved = False
+        else:
+            is_approved = True
+        user = User(
+            username=validated_data['username'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
+            avatar=validated_data.get('avatar'),  # Ảnh đại diện của bạn
+            role=role,
+            is_approved=is_approved
+        )
         user.set_password(validated_data['password'])
         user.save()
         return user
@@ -197,6 +210,8 @@ class DishSearchSerializer(serializers.ModelSerializer):
             'id', 'name', 'price',
             'prep_time', 'avg_rating'
         ]
+
+
 
 
 

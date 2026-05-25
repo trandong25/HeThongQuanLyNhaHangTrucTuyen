@@ -53,6 +53,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 4,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -174,3 +175,18 @@ MOMO_PARTNER_CODE = "MOMO"
 MOMO_ACCESS_KEY = "F8BBA842ECF85"
 MOMO_SECRET_KEY = "K951B6PE1waDMi640xX08PD3vg6EkVlz"
 MOMO_ENDPOINT = "https://test-payment.momo.vn/v2/gateway/api/create"
+
+
+# from dotenv import load_dotenv
+# import os
+#
+# # load file .env
+# load_dotenv(BASE_DIR / ".env")
+#
+# # đọc env
+# GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+# GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+# JWT_SECRET = os.getenv("JWT_SECRET")
+
+
+

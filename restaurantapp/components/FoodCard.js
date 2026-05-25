@@ -42,7 +42,7 @@ const FoodCard = ({item, onPress}) => {
                     </Text>
                     
                     <Text variant="bodySmall" style={Styles.foodChef}>
-                        👨‍🍳 Đầu bếp {item.chef?.first_name || item.chef?.username || "Đồng"}
+                        👨‍🍳 Đầu bếp {item.chef?.first_name  || "Đồng"}
                     </Text>
 
                     

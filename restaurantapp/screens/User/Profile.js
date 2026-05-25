@@ -17,8 +17,8 @@ const Profile = () => {
             { 
                 text: "Đăng xuất", 
                 onPress: async () => {
-                    await AsyncStorage.removeItem("access_token");
-                    dispatchUser({ type: "logout" });
+                    await AsyncStorage.removeItem("token");
+                    dispatchUser({ type: "LOGOUT" });
                 },
                 style: "destructive"
             }

@@ -155,8 +155,8 @@ const SearchScreen = () => {
                     <TouchableOpacity style={Styles.sortItem} onPress={() => { setOrdering('price'); setShowSortOptions(false); }}>
                         <Text style={ordering === 'price' ? Styles.sortTextActive : Styles.sortText}>Giá: Thấp đến Cao</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity Style={Styles.sortItem} onPress={() => { setOrdering('-price'); setShowSortOptions(false); }}>
-                        <Text style={ordering === '-price' ? Styles.sortTextActive : Styles.sortText}>Giá: Cao đến Thấp</Text>
+                    <TouchableOpacity style={Styles.sortItem} onPress={() => { setOrdering('price'); setShowSortOptions(false); }}>
+                        <Text style={ordering === 'price' ? Styles.sortTextActive : Styles.sortText}>Giá: Cao đến Thấp</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={Styles.sortItem} onPress={() => { setOrdering('-rating'); setShowSortOptions(false); }}>
                         <Text style={ordering === '-rating' ? Styles.sortTextActive : Styles.sortText}>Theo Đánh giá</Text>
