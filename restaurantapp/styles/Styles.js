@@ -16,7 +16,7 @@ export default StyleSheet.create({
         backgroundColor: COLORS.background,
         padding: 20
     },
-     row: {
+    row: {
         flexDirection: "row"
     },
     center:{
@@ -204,6 +204,12 @@ cartItem: {
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
+    },relative: {
+        position: 'relative'
+    },
+    shadow: {
+        elevation: 5,
+        shadowColor: "#000"
     },
     foodImage: {
         height: 130, 
@@ -370,4 +376,28 @@ cartItem: {
 
 
 
+
+//add dish
+dropdown: {
+        marginVertical: 8,
+        backgroundColor: '#f5f5f5',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        height: 50,
+    },
+    item: {
+        padding: 15,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    textItem: {
+        flex: 1,
+        fontSize: 16,
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+    },
 });

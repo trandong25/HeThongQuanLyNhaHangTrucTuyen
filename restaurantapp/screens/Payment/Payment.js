@@ -8,6 +8,8 @@ import { formatPrice } from "../../components/FoodCard";
 import styles from "../Reservation/styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApis, endpoints } from "../../configs/APIs";
+import OrderSummary from "../../components/OrderCard";
+import CheckoutFooter from "../../components/ButtonFooter";
 
 
 const PAYMENT_METHODS = [
@@ -137,36 +139,18 @@ const Payment = ({route}) => {
         )
     }
     return(
-        <View>
+        <View style={{ flex: 1, backgroundColor: Styles.backgroundLight }}>
             <Appbar.Header>
                 <Appbar.BackAction onPress={() => nav.goBack()} />
                 <Appbar.Content title="Chọn thanh toán" />
             </Appbar.Header>
-            <ScrollView>
-                <Card>
-                    <Card.Title
-                        title="Tóm tắt đơn hàng "
-                        titleStyle={{fontWeight:'bold'}}
-                    />
-                    <Card.Content>
-                        {cartItems.map(item => (
-                            <View key={item.id }>
-                                <Text style={{ flex: 1 }}>{item.name} x{item.quantity}</Text>
-                                <Text style={{ color: '#E65100', fontWeight: '600' }}>
-                                    {formatPrice(item.price * item.quantity)}đ
-                                </Text>
-                            </View>
-                            
-                        ))}
-                        <Divider style={{ marginVertical: 12 }} />
-                        <View style={Styles.itemRow}>
-                            <Text style={Styles.totalLabel}>Tổng cộng:</Text>
-                            <Text style={Styles.totalAmount}>
-                                {formatPrice(totalAmount)}đ
-                            </Text>
-                        </View>
-                    </Card.Content>
-                </Card>
+            <ScrollView style = {Styles.scrollContainer}>
+                
+                <OrderSummary 
+                    cartItems={cartItems} 
+                    totalAmount={totalAmount} 
+                    title="Tóm tắt đơn hàng" 
+                />
                 <Card style={Styles.card}>
                     <Card.Title title="Thông tin đặt bàn" titleStyle={{ fontWeight: 'bold' }} />
                     <Card.Content>
@@ -219,25 +203,14 @@ const Payment = ({route}) => {
                         </RadioButton.Group>
                     </Card.Content>
                 </Card>
+                <View style={{ height: 100 }} />
             </ScrollView>
-            <View style={Styles.footer}>
-                <View style={Styles.footerTotal}>
-                    <Text style={{ color: '#fff' }}>Tổng tiền:</Text>
-                    <Text style={Styles.footerAmount}>{formatPrice(totalAmount)}đ</Text>
-                </View>
-                <Button
-                    mode="contained"
-                    buttonColor="#fff"
-                    textColor="#E65100"
-                    style={Styles.confirmBtn}
-                    contentStyle={{ height: 50 }}
-                    loading={loading}
-                    disabled={loading}
-                    onPress={handlePayment}
-                >
-                    Xác nhận đặt hàng
-                </Button>
-            </View>
+            <CheckoutFooter 
+                totalAmount={totalAmount}
+                buttonText="Xác nhận thanh toán"
+                onPress={handlePayment}
+                loading={loading}
+            />
         </View>
     )
 } 

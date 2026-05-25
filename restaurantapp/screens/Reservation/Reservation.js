@@ -8,6 +8,7 @@ import { formatPrice } from "../../components/FoodCard";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import styles from "../Reservation/styles";
 import CheckoutFooter from "../../components/ButtonFooter";
+import OrderSummary from "../../components/OrderCard";
 
 const Reservation = () => {
     const nav = useNavigation();
@@ -20,7 +21,9 @@ const Reservation = () => {
     const [time, setTime] = useState(new Date());
     const [showPicker, setShowPicker] = useState(false);
     const [mode, setMode] = useState('date');
+    
 
+    
     const increaseGuests = () => {
     setGuests(prev => Math.min(prev + 1, 20)); 
     };
@@ -42,16 +45,15 @@ const Reservation = () => {
             }
         }
     };
-    const combineDateTimeLocal = (dateObj, timeObj) => {
+    const combineDateTime = (dateObj, timeObj) => {
         const year = dateObj.getFullYear();
-        const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-        const day = dateObj.getDate().toString().padStart(2, '0');
-        
-        const hours = timeObj.getHours().toString().padStart(2, '0');
-        const minutes = timeObj.getMinutes().toString().padStart(2, '0');
-        const seconds = "00";
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const hours = String(timeObj.getHours()).padStart(2, '0');
+        const minutes = String(timeObj.getMinutes()).padStart(2, '0');
+        const seconds = '00';
 
-        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+07:00`;
     };
     const handleCheckOut = () => {
         if (!date || !time || !guests) {
@@ -67,24 +69,12 @@ const Reservation = () => {
                 <Appbar.Content title="Đặt bàn" titleStyle={{ fontWeight: 'bold' }} />
             </Appbar.Header>
             <ScrollView style={styles.scrollContainer}>
-                <Card>
-                    <Card.Title title="Đơn đặt" titleStyle={{ fontWeight: 'bold', color: COLORS.primary }} />
-                        <Card.Content>
-                            {cartItems.map(item => (
-                                <View key={item.id} style={[Styles.row, Styles.between, { marginBottom: 10 }]}>
-                                    <Text>{item.name} x {item.quantity}</Text>
-                                    <Text>{formatPrice(item.quantity * item.price)}</Text>
-                                </View>
-                            ))}
-                            <Divider style={{ marginVertical: 20 }} />
-                            <View style={[Styles.row, { justifyContent: 'space-between'}]}>
-                                <Text style={{ fontWeight: 'bold', fontSize: 16 }}>Tổng cộng:</Text>
-                                <Text style={{ fontWeight: 'bold', fontSize: 18, color: COLORS.primary }}>
-                                    {formatPrice(subTotal)}đ
-                                </Text>
-                            </View>
-                        </Card.Content>
-                </Card> 
+                
+                <OrderSummary 
+                    cartItems={cartItems} 
+                    totalAmount={subTotal} 
+                    title="Đơn đặt" 
+                />
                 
                 <View style={styles.whiteBox}>
                     <Text style={styles.boxTitle}>
@@ -151,8 +141,9 @@ const Reservation = () => {
             <CheckoutFooter
                 totalAmount={subTotal}
                 buttonText="Chọn thanh toán"
+                loading={false}
                 onPress={() => {
-                    const reservationDateTime = combineDateTimeLocal(date, time);
+                    const reservationDateTime = combineDateTime(date, time);
 
                     nav.navigate("Payment", {
                     reservation_time: reservationDateTime,

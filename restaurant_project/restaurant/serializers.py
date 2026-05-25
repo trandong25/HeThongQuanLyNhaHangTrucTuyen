@@ -2,8 +2,7 @@ from rest_framework import serializers
 from .models import User,Category,Dish,Review,Ingredient,Transaction
 from .models import Table,Reservation, OrderDetail, Order
 from django.db.models import Avg
-
-
+from datetime import timedelta
 
 
 
@@ -44,8 +43,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'password', 'first_name', 'last_name', 'avatar', 'role','is_approved']
         extra_kwargs = {
-            'password': {'write_only': True}  # Bảo mật: Mật khẩu chỉ được phép gửi lên để lưu, cấm trả về khi GET
+            'password': {'write_only': True}
         }
+
     def create(self, validated_data):
         role = validated_data.get('role','CUSTOMER')
         if role == 'CHEF':
@@ -90,6 +90,7 @@ class ReservationSerializer(serializers.ModelSerializer):
     customer_name = serializers.StringRelatedField(source='customer', read_only=True)
     table_info = TableSerializer(source='table', read_only=True)
 
+
     class Meta:
         model = Reservation
         fields = ['id', 'customer', 'customer_name','table', 'table_info', 'reservation_time', 'number_of_people', 'status','created_date']
@@ -103,18 +104,17 @@ class ReservationSerializer(serializers.ModelSerializer):
         people = validated_data['number_of_people']
         time = validated_data['reservation_time']
 
+        start = time - timedelta(minutes=90)
+        end = time + timedelta(minutes=90)
+
         busy_tables = Reservation.objects.filter(
-            reservation_time=time
-        ).exclude(
-            status='CANCELLED'
+            reservation_time__gte=start,
+            reservation_time__lte=end,
+            status__in=['PENDING', 'CONFIRMED']
         ).values_list('table_id', flat=True)
 
-        table = Table.objects.filter(
-            is_available=True,
-            capacity__gte=people
-        ).exclude(
-            id__in=busy_tables
-        ).order_by('capacity').first()
+        table = (Table.objects.filter(is_available=True,capacity__gte=people)
+                 .exclude(id__in=busy_tables).order_by('capacity').first())
 
         if not table:
             raise serializers.ValidationError(
@@ -124,19 +124,22 @@ class ReservationSerializer(serializers.ModelSerializer):
 
         return super().create(validated_data)
 class OrderDetailSerializer(serializers.ModelSerializer):
+    dish_name = serializers.CharField(source='dish.name', read_only=True)
+
     class Meta:
         model = OrderDetail
-        fields = ['id', 'dish', 'quantity', 'unit_price']
+        fields = ['id', 'dish', 'dish_name', 'quantity', 'unit_price']
         extra_kwargs = {
-            'unit_price': {'read_only':True}
+            'unit_price': {'read_only': True}
         }
 
 class OrderSerializer(serializers.ModelSerializer):
     order_details = OrderDetailSerializer(many = True, write_only=True)
+    details = OrderDetailSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id','customer','status','total_amount','created_date','order_details']
+        fields = ['id', 'customer', 'status', 'total_amount', 'created_date', 'order_details', 'details', 'reservation']
         extra_kwargs = {
             'customer': {'read_only': True},
             'status': {'read_only': True},
@@ -210,8 +213,6 @@ class DishSearchSerializer(serializers.ModelSerializer):
             'id', 'name', 'price',
             'prep_time', 'avg_rating'
         ]
-
-
 
 
 

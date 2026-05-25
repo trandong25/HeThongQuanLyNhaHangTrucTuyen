@@ -17,12 +17,17 @@ class DishForm(forms.ModelForm):
         self.fields['description'].required = False
 
 class DishAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'price', 'category', 'prep_time', 'active', 'image_preview']
+    list_display = ['id', 'name', 'price', 'category', 'chef','prep_time', 'active', 'image_preview']
     search_fields = ['name']
     list_filter = ['category','active']
     readonly_fields = ['image_preview']
     filter_horizontal = ('ingredients',)
 
+    # locj user role Chef
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "chef":
+            kwargs["queryset"] = User.objects.filter(role='CHEF')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     def image_preview(self, obj):
         if obj.image:
             return mark_safe(f'<img src="{obj.image.url}" width="100" style="border-radius: 5px;" />')

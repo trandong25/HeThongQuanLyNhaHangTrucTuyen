@@ -2,7 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from django.core.serializers import serialize
 from rest_framework import viewsets, generics, permissions,status, parsers,filters
-from .models import Category, Dish, User, Review,Reservation, Order,Transaction, OrderDetail
+from .models import Category, Dish, User, Review, Reservation, Order, Transaction, OrderDetail, Ingredient
 from restaurant import serializers, paginators,perms
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,7 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.functions import TruncDay
 from oauthlib.uri_validate import query
 from rest_framework.permissions import IsAuthenticated
-from .serializers import CompareDishSerializer, ReviewSerializer
+from .serializers import CompareDishSerializer, ReviewSerializer, IngredientSerializer
 from django.db.models import  Sum, Avg, F
 from .serializers import DishSerializer
 import requests
@@ -27,8 +27,8 @@ class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
     permission_classes = [permissions.AllowAny]
 
 class DishViewSet(viewsets.ModelViewSet):
-    queryset = Dish.objects.all().order_by('-id')
-    serializer_class = DishSerializer
+    queryset = Dish.objects.prefetch_related('ingredients').filter(active=True)
+    serializer_class = serializers.DishSerializer
     pagination_class = paginators.DishPaginator
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -40,7 +40,7 @@ class DishViewSet(viewsets.ModelViewSet):
         queryset = Dish.objects.filter(active = True).order_by('-id')
         q =self.request.query_params.get('q')
         if q:
-            queryset = queryset.filter(name__contains=q   )
+            queryset = queryset.filter(name__icontains=q   )
         category_id =   self.request.query_params.get('category_id')
         if category_id:
             queryset = queryset.filter(category_id=category_id)
@@ -64,6 +64,8 @@ class DishViewSet(viewsets.ModelViewSet):
             return serializers.ReviewSerializer
         return self.serializer_class
 
+    def perform_create(self, serializer):
+        serializer.save(chef=self.request.user)
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [perms.IsApprovedChef()]
@@ -85,7 +87,22 @@ class DishViewSet(viewsets.ModelViewSet):
         except Dish.DoesNotExist:
             return Response({"detail": "Không tìm thấy món ăn này"}, status=status.HTTP_404_NOT_FOUND)
 
+    def destroy(self, request, *args, **kwargs):
+        dish = self.get_object()
+        dish.active = False
+        dish.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
+class IngredientViewSet(viewsets.ModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    permission_classes = [permissions.AllowAny]
+    pagination_class = None
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [permissions.IsAuthenticated(), perms.IsApprovedChef()]
+        return [permissions.AllowAny()]
 
 class UserViewSet(viewsets.ViewSet,generics.CreateAPIView):
     queryset = User.objects.filter(is_active = True)
@@ -113,8 +130,6 @@ class ReviewViewSet(viewsets.ViewSet,generics.DestroyAPIView, generics.UpdateAPI
             return [perms.IsReviewOwner()]
         return [permissions.IsAuthenticatedOrReadOnly()]
 
-
-
 class ReservationViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView):
     serializer_class = serializers.ReservationSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -130,7 +145,12 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
     permission_classes =  [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return  Order.objects.filter(customer = self.request.user).order_by('-created_date')
+        user = self.request.user
+        if user.role == 'CHEF':
+            return Order.objects.filter(details__dish__chef=user).distinct().order_by('-created_date')
+        else:
+            return Order.objects.filter(customer=user).order_by('-created_date')
+
 
     @action(methods=['post'], detail=True, url_path='pay')
     def pay(self, request,pk):
@@ -145,6 +165,11 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
             amount = order.total_amount,
             payment_method = method
         )
+
+        if order.reservation:
+            order.reservation.status = 'CONFIRMED'
+            order.reservation.save()
+
         if method == 'CASH':
             transaction.status = 'PENDING'
             transaction.save()
@@ -159,8 +184,9 @@ class OrderViewSet(viewsets.ViewSet,generics.ListAPIView,generics.CreateAPIView)
                 "message": f"Vui lòng truy cập đường dẫn để thanh toán qua {method}",
                 "payment_url": mock_payment_url,
                 "transaction_id": transaction.id,
-                "status": transaction.status  # Vẫn đang là PENDING
+                "status": transaction.status
             }, status=status.HTTP_200_OK)
+
         return Response({"error": "Phương thức thanh toán không hỗ trợ"}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post', 'get'], url_path='reviews', detail=True)

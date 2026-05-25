@@ -18,10 +18,6 @@ class User(AbstractUser):
         ('CHEF','Chef'),
         ('CUSTOMER','Customer')
     ]
-    STATUS_CHOICES = [
-        ('PENDING', 'Pending'),
-        ('APPROVED', 'Approved'),
-    ]
     avatar = CloudinaryField(null =True)
     phone_number = models.CharField(max_length=15, null = True, blank=True)
     role = models.CharField(max_length=10, choices= ROLE_CHOICES, default="CUSTOMER")
@@ -81,7 +77,8 @@ class Reservation(BaseModel):
     RESERVATION_STATUS = [
         ('PENDING', 'Chờ duyệt'),
         ('CONFIRMED', 'Đã xác nhận'),
-        ('CANCELLED', 'Đã hủy')
+        ('CANCELLED', 'Đã hủy'),
+        ('DONE', 'Đã hoàn thành')
     ]
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reservations')
     table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True,blank=True)
