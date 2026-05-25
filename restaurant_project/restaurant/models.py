@@ -18,6 +18,10 @@ class User(AbstractUser):
         ('CHEF','Chef'),
         ('CUSTOMER','Customer')
     ]
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+    ]
     avatar = CloudinaryField(null =True)
     phone_number = models.CharField(max_length=15, null = True, blank=True)
     role = models.CharField(max_length=10, choices= ROLE_CHOICES, default="CUSTOMER")

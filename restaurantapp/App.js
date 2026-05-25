@@ -17,6 +17,7 @@ import { CartContext, MyUserContext } from "./configs/Contexts";
 import { CartReducer } from "./reducers/CartReducer";
 import Reservation from "./screens/Reservation/Reservation";
 import SearchScreen from "./screens/Search/SearchScreen";
+import Payment from "./screens/Payment/Payment";
 
 
 const Stack = createNativeStackNavigator(); 
@@ -85,8 +86,8 @@ const RootNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={TabNavigator} />
-      
       <Stack.Screen name="Reservation" component={Reservation} />
+      <Stack.Screen name="Payment" component={Payment} />
     </Stack.Navigator>
   );
 }

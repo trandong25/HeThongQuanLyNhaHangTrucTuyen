@@ -78,8 +78,6 @@ const FoodDetail = ({ route }) => {
             </View>
 
             <Divider style={{ marginHorizontal: 16 }} />
-
-            {/* PHẦN HIỂN THỊ DANH SÁCH ĐÁNH GIÁ CỦA KHÁCH HÀNG */}
             <View style={{ padding: 16 }}>
                 <Text variant="titleMedium" style={{ fontWeight: 'bold', marginBottom: 12 }}>
                     Khách hàng đánh giá ({reviews.length})

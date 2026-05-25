@@ -14,6 +14,10 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import CompareDishSerializer, ReviewSerializer
 from django.db.models import  Sum, Avg, F
 from .serializers import DishSerializer
+import requests
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.conf import settings
 
 
 class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
@@ -250,4 +254,31 @@ class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = serializers.TransactionSerializer
     permission_classes = [IsAuthenticated]
+
+
+
+
+
+@api_view(['POST'])
+def login_proxy(request):
+
+    username = request.data.get("username")
+    password = request.data.get("password")
+    token_url=request.build_absolute_uri("/o/token/")
+
+    payload = {
+        "username": username,
+        "password": password,
+        "client_id": settings.CLIENT_ID,
+        "client_secret": settings.CLIENT_SECRET,
+        "grant_type": "password"
+    }
+    print("👉 URL GỌI ĐẾN:", token_url)
+    print("👉 PAYLOAD GỬI ĐI:", payload)
+
+    res = requests.post(token_url, data=payload)
+    print("👉 KẾT QUẢ TỪ OAUTH2:", res.text)
+
+    return Response(res.json(), status=res.status_code)
+
 

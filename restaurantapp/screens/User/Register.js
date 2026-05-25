@@ -5,6 +5,7 @@ import * as ImgPicker from "expo-image-picker";
 import { useState } from "react";
 import Apis, { endpoints } from "../../configs/APIs";
 import { useNavigation } from "@react-navigation/native";
+import { SegmentedButtons } from 'react-native-paper';
 
 const Register = () => {
     const userInfo = [
@@ -42,6 +43,7 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [role,setRole] = useState("CUSTOMER");
 
     const nav = useNavigation();
 
@@ -99,6 +101,7 @@ const Register = () => {
                 setLoading(true);
 
                 let form = new FormData();
+                form.append("role", role);
 
                 for (let key of Object.keys(user)) {
                     if (key !== "confirm") {
@@ -128,7 +131,11 @@ const Register = () => {
                 );
 
                 if (res.status === 201) {
-                    alert("Đăng ký thành công!");
+                    if (role === "CHEF") {
+                        alert("Tài khoản Đầu bếp của bạn đang chờ Admin phê duyệt trước khi sử dụng.");
+                    } else {
+                        alert("Đăng ký thành công!");
+                    }
                     nav.navigate("Login");
                 } else {
                     setErr("Đăng ký thất bại!");
@@ -136,8 +143,10 @@ const Register = () => {
 
             } catch (ex) {
                 console.error(ex);
+                
 
                 if (ex.response) {
+                    console.log("👉 ĐÂY LÀ LỖI TỪ DJANGO:", ex.response.data);
                     setErr("Username đã tồn tại!");
                 } else {
                     setErr("Không thể kết nối server!");
@@ -148,7 +157,6 @@ const Register = () => {
             }
         }
     };
-
     return (
     <ScrollView
         style={Styles.container}
@@ -205,6 +213,21 @@ const Register = () => {
                 />
             );
         })}
+        <SegmentedButtons
+        value={role}
+        onValueChange={setRole}
+        buttons={[
+          {
+            value: 'CUSTOMER',
+            label: 'Khách hàng',
+          },
+          {
+            value: 'CHEF',
+            label: 'Đầu bếp',
+          },
+        ]}
+         />
+        
 
         {/* Avatar Picker */}
         <TouchableOpacity style={Styles.avatarPicker} onPress={picker}>
