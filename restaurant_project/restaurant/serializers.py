@@ -65,10 +65,12 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class ReviewSerializer(serializers.ModelSerializer):
+    customer = UserSerializer(read_only=True)
     class Meta:
         model = Review
         fields = ['id', 'rating', 'comment', 'created_date', 'customer', 'dish']
         extra_kwargs = {
+            'dish': {'write_only': True},
             'customer': {'read_only': True}
         }
     def to_representation(self, instance):

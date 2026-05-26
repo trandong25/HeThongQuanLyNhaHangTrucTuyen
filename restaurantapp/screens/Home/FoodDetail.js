@@ -90,15 +90,28 @@ const FoodDetail = ({ route }) => {
                 ) : (
                     reviews.map((rev) => (
                         <View key={rev.id} style={{ flexDirection: 'row', marginBottom: 15, backgroundColor: '#f9f9f9', padding: 10, borderRadius: 8 }}>
-                            <Avatar.Text
-                                size={36}
-                                label={rev.customer?.username?.substring(0, 2).toUpperCase() || "UN"}
-                                style={{ backgroundColor: '#E65100', marginRight: 10 }}
-                            />
+                                {rev.customer?.avatar ? (
+                                    <Image
+                                        source={{ uri: rev.customer.avatar }}
+                                        style={{
+                                            width: 36, height: 36, borderRadius: 18,
+                                            marginRight: 10, backgroundColor: '#E65100'
+                                        }}
+                                    />
+                                ) : (
+                                    <Avatar.Text
+                                        size={36}
+                                        label={rev.customer?.username?.substring(0, 2).toUpperCase() || "UN"}
+                                        style={{ backgroundColor: '#E65100', marginRight: 10 }}
+                                    />
+                                )}
                             <View style={{ flex: 1 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Text style={{ fontWeight: 'bold' }}>{rev.customer?.username || "Người dùng"}</Text>
-                                    <Text style={{ color: '#FFD700' }}>{'★'.repeat(Math.floor(rev.rating))}</Text>
+                                    <Text style={{ color: '#FFD700', fontSize: 16 }}>
+                                        {'★'.repeat(Math.floor(rev.rating))}
+                                        {'☆'.repeat(5 - Math.floor(rev.rating))}
+                                    </Text>
                                 </View>
                                 <Text style={{ color: '#444', marginTop: 4 }}>{rev.comment}</Text>
                             </View>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-import { Appbar, Card, Chip } from 'react-native-paper';
+import { Appbar, Button, Card, Chip, Divider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authApis, endpoints } from '../../configs/APIs';
 import { COLORS } from '../../styles/Styles';
@@ -8,6 +8,7 @@ import { COLORS } from '../../styles/Styles';
 const MyReservations = ({ navigation }) => {
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [orders, setOrders] = useState([]);
 
     const fetchReservations = async () => {
         try {
@@ -15,9 +16,15 @@ const MyReservations = ({ navigation }) => {
             const token = await AsyncStorage.getItem('token');
             if (!token) return;
             const api = authApis(token);
-            const res = await api.get(endpoints['reservations']);
-            const data = res.data?.results || res.data;
-            setReservations(Array.isArray(data) ? data : []);
+            const [resResult, orderResult] = await Promise.all([
+                api.get(endpoints['reservations']),
+                api.get(endpoints['orders']),
+            ]);
+
+            const resData = resResult.data?.results || resResult.data;
+            const orderData = orderResult.data?.results || orderResult.data;
+            setReservations(Array.isArray(resData) ? resData : []);
+            setOrders(Array.isArray(orderData) ? orderData : []);
         } catch (error) {
             console.error('Lỗi tải danh sách đặt bàn:', error);
             Alert.alert('Lỗi', 'Không thể tải danh sách đặt bàn của bạn.');
@@ -34,6 +41,7 @@ const MyReservations = ({ navigation }) => {
         switch (status) {
             case 'CONFIRMED': return { color: '#4CAF50', label: 'Đã xác nhận', icon: 'check-circle' };
             case 'CANCELLED': return { color: '#F44336', label: 'Đã hủy', icon: 'close-circle' };
+            case 'DONE': return { color: '#2196F3', label: 'Hoàn thành', icon: 'check-all' };
             default: return { color: '#FF9800', label: 'Chờ duyệt', icon: 'clock' };
         }
     };
@@ -48,6 +56,9 @@ const MyReservations = ({ navigation }) => {
             
             formattedDate = `${hours}:${minutes} - ${day}/${month}/${year}`;
     }
+        const relatedOrder = orders.find(o => o.reservation === item.id);
+        const orderDetails = relatedOrder?.details ?? [];
+        const isDone = !!relatedOrder && orderDetails.length > 0;
         return (
             <Card style={styles.card}>
                 <Card.Content>
@@ -70,6 +81,23 @@ const MyReservations = ({ navigation }) => {
                         {item.customer_name && <Text>Người đặt: {item.customer_name}</Text>}
                     </View>
                 </Card.Content>
+                {isDone && orderDetails.length > 0 &&(
+                    <>
+                        <Divider style={{ marginVertical: 8 }} />
+                        <View style={{ padding: 10 }}>
+                            <Button 
+                                mode="contained" 
+                                buttonColor="#E65100"
+                                style={{ width: '100%', borderRadius: 5 }}
+                                onPress={() => navigation.navigate('Review', { 
+                                    orderDetails: orderDetails || [] 
+                                })}
+                            >
+                                ⭐ Đánh giá sản phẩm
+                            </Button>
+                        </View>
+                    </>
+                )}
             </Card>
         );
     };

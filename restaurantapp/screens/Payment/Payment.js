@@ -72,7 +72,9 @@ const Payment = ({route}) => {
                             'pendingPayment',
                             JSON.stringify(route.params)
                         );
-                        nav.navigate("MainTabs", { screen: "Tài khoản" })
+                        nav.navigate("MainTabs", { screen: "Tài khoản" ,
+                            
+                        })
                     }
                 }
             ]
@@ -122,8 +124,18 @@ const Payment = ({route}) => {
                                 "✅ Đặt hàng thành công!",
                                 `Mã đơn: #${orderId}\n${payRes.data.message}`,
                                 [{
-                                    text: "OK",
-                                    onPress: () => nav.navigate('MainTabs', { screen: 'Trang chủ' })
+                                    text: "Xem đặt bàn & Đánh giá",
+                                    onPress: () => {
+                                        dispatchCart({ type: "CLEAR_CART" });
+                                        nav.navigate('MyReservations', { defaultTab: 'orders' });
+                                    }
+                                },
+                                {
+                                    text: "Về trang chủ",
+                                    onPress: () => {
+                                        dispatchCart({ type: "CLEAR_CART" });
+                                        nav.navigate('MainTabs', { screen: 'Home' });
+                                    }
                                 }]
                             );
 

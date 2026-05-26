@@ -22,6 +22,8 @@ import ChefHome from "./screens/Chef/ChefHome";
 import AddDish from "./screens/Chef/AddDish";
 import Payment from "./screens/Payment/Payment";
 import MyReservations from "./screens/Reservation/MyReservation";
+import CompareScreen from "./screens/Home/CompareScreen";
+import Review from "./screens/review/Review";
 
 
 const Stack = createNativeStackNavigator(); 
@@ -64,7 +66,9 @@ const HomeStackNavigator = () =>{
       <Stack.Screen name="SearchScreen" component={SearchScreen}
                 options={{ headerShown: true, title: "Tìm kiếm món ăn" }}/>
       <Stack.Screen name="food-detail" component={FoodDetail} 
-                  options={{ headerShown:true ,title:"Chi tiết món ăn"}} />
+                options={{ headerShown:true ,title:"Chi tiết món ăn"}} />
+      <Stack.Screen name="compare" component={CompareScreen} 
+                options={{ headerShown:true ,title:"So sánh món ăn"}} />
     </Stack.Navigator>
   )
 }
@@ -130,6 +134,7 @@ const RootNavigator = () => {
       <Stack.Screen name="Reservation" component={Reservation} />
       <Stack.Screen name="MyReservations" component={MyReservations} />
       <Stack.Screen name="Payment" component={Payment} />
+      <Stack.Screen name="Review" component={Review}  />
     </Stack.Navigator>
   );
 }

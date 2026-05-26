@@ -29,7 +29,7 @@ export default StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-//FoodCart
+//FoodCard
 cardWrapper: {
         flex: 0.5,
         padding: 6
@@ -44,14 +44,31 @@ cardWrapper: {
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15,
     },
-    hotBadge: {
+    btnCompare: {
         position: 'absolute',
         top: 8,
         right: 8,
+        backgroundColor: '#fff',
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        justifyContent: 'center',
+        borderColor: '#E65100',
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 2,
+    },
+    hotBadge: {
+        position: 'absolute',
+        top: 8,
+        left: 8,
         backgroundColor: COLORS.primaryLight,
         paddingHorizontal: 8,
         paddingVertical: 3,
         borderRadius: 8,
+        zIndex: 2,
+        
     },
     hotBadgeText: {
         color: COLORS.background,
@@ -83,7 +100,9 @@ cardWrapper: {
         fontSize: 12
     },
     priceRow: {
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     priceText: {
         fontSize: 16,
@@ -210,45 +229,6 @@ cartItem: {
     shadow: {
         elevation: 5,
         shadowColor: "#000"
-    },
-    foodImage: {
-        height: 130, 
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-    },
-    hotBadge: {
-        position: 'absolute',
-        top: 8, 
-        right: 8, 
-        backgroundColor: '#FF6D00',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 12,
-        elevation: 2,
-    },
-    hotText: {
-        color: '#fff',
-        fontSize: 10,
-        fontWeight: 'bold',
-    },
-    priceRow: {
-        flexDirection: "row",
-        justifyContent: "space-between", 
-        alignItems: "center",
-        marginTop: 10,
-    },
-    price: { 
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#E65100'
-    },
-    addBtn: {
-        width: 34, 
-        height: 34,
-        backgroundColor: '#E65100',
-        borderRadius: 17, 
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     addBtnText: {
         color: '#fff',
@@ -400,4 +380,81 @@ dropdown: {
     selectedTextStyle: {
         fontSize: 16,
     },
+    //compare
+    container: { flex: 1, backgroundColor: '#fff', padding: 16 },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
+    dishCol: { flex: 1, alignItems: 'center', marginHorizontal: 4 },
+    image: { width: 130, height: 110, borderRadius: 12 },
+    dishName: {
+        fontWeight: 'bold', textAlign: 'center',
+        marginTop: 8, fontSize: 13, color: '#333',
+    },
+    labelRow: {
+        alignItems: 'center',
+        paddingVertical: 6,
+    },
+    rowLabel: {
+        fontWeight: 'bold', fontSize: 14,
+        color: '#555', textAlign: 'center',
+    },
+    valueRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 8,
+    },
+    valueBox: {
+        flex: 1, alignItems: 'center',
+        marginHorizontal: 4,
+        padding: 8, borderRadius: 8,
+        backgroundColor: '#f9f9f9',
+    },
+    winnerBox: {
+        backgroundColor: '#FFF3E0',
+        borderWidth: 1,
+        borderColor: '#E65100',
+    },
+    winnerBadge: {
+        fontSize: 10, color: '#E65100',
+        fontWeight: 'bold', marginBottom: 2,
+    },
+    valueText: {
+        fontSize: 13, color: '#333',
+        textAlign: 'center',
+    },
+    winnerText: {
+        color: '#E65100', fontWeight: 'bold',
+    },
+    actionRow: { marginBottom: 30 },
+    btn: { borderRadius: 10 },
+    actionRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 8,
+        marginTop: 24,
+        marginBottom: 40,
+    },
+    btnWrapper: {
+        flex: 1,
+        marginHorizontal: 6,
+    },
+    btnText: {
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+compareBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 14,
+    marginHorizontal: 12,
+    marginVertical: 8,
+    borderRadius: 10,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+},
+
 });

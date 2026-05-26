@@ -1,9 +1,10 @@
 import { Alert, TouchableOpacity, View } from "react-native"
 import { Card,Icon,Text } from "react-native-paper"
-import Styles,{COLORS} from "../styles/Styles"
+import Styles ,{COLORS} from "../styles/Styles" 
 import { useContext } from "react"
 import { CartContext, MyUserContext } from "../configs/Contexts"
 import { useNavigation } from "@react-navigation/native";
+
 
 
  export const formatPrice = (price) => {
@@ -11,7 +12,7 @@ import { useNavigation } from "@react-navigation/native";
         return parseFloat(price).toLocaleString('vi-VN'); 
     }
 
-const FoodCard = ({item, onPress}) => {
+const FoodCard = ({item, onPress,onComparePress,isComparing}) => {
     const [cart, dispatchCart] = useContext(CartContext);
     const [user, ] = useContext(MyUserContext);
     const navigation = useNavigation();
@@ -39,8 +40,12 @@ const FoodCard = ({item, onPress}) => {
     }
     return (
         <TouchableOpacity style={Styles.cardWrapper} activeOpacity={0.8} onPress={onPress}>
-            <Card style={Styles.foodCard}>
-                <View style={{ position: 'relative' }}>
+            <Card style={[
+                Styles.foodCard,
+                isComparing ? { borderColor: '#E65100' } : {}
+                    
+            ]}>
+                <View style={{ position: 'relative', width: '100%'}}>
                     <Card.Cover
                         source={{ uri: item.image }}
                         style={Styles.foodImage}
@@ -48,6 +53,20 @@ const FoodCard = ({item, onPress}) => {
                     <View style={Styles.hotBadge}>
                         <Text style={Styles.hotBadgeText}>HOT</Text>
                     </View>
+                    <TouchableOpacity 
+                        onPress={onComparePress} 
+                        style={[
+                            Styles.btnCompare,
+                            isComparing ? { backgroundColor: '#E65100' } : {}
+                        ]}
+                    >
+                    <Icon 
+                        source={isComparing ? "check" : "scale-balance"} 
+                        size={18} 
+                        color={isComparing ? "#fff" : "#E65100"} 
+                    />
+                </TouchableOpacity>
+
                 </View>
 
                 <Card.Content style={Styles.cardContent}>
