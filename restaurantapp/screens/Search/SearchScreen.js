@@ -106,7 +106,7 @@ const SearchScreen = () => {
             {/* 2. PANEL BỘ LỌC NÂNG CAO GỐC */}
             {showAdvanced && (
                 <View style={Styles.advancedPanel}>
-                    <Text style={Styles.panelTitle}>Bộ lọc nâng cao bài tập</Text>
+                    <Text style={Styles.panelTitle}>Bộ lọc nâng cao </Text>
                     <TextInput
                         style={Styles.nativeInput}
                         placeholder="Tên đầu bếp phụ trách..."
@@ -146,7 +146,6 @@ const SearchScreen = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Khung chứa các lựa chọn sắp xếp khi bấm vào nút */}
             {showSortOptions && (
                 <View style={Styles.sortOptionsContainer}>
                     <TouchableOpacity style={Styles.sortItem} onPress={() => { setOrdering('name'); setShowSortOptions(false); }}>
@@ -177,7 +176,12 @@ const SearchScreen = () => {
                 renderItem={({item}) => (
                     <FoodCard 
                         item={item} 
-                        onPress={() => nav.navigate('food-detail', { foodId: item.id })} 
+                        onPress={() => {
+                            nav.navigate('Home', {
+                                screen: 'food-detail',
+                                params: { foodId: item.id },
+                            });
+                        }} 
                     />
                 )}
             />

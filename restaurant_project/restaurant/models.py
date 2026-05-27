@@ -100,7 +100,7 @@ class Order(BaseModel):
     reservation = models.ForeignKey(Reservation,on_delete=models.SET_NULL, null=True, blank=True)
     total_amount = models.DecimalField(max_digits=12,decimal_places=2,default=0)
     status = models.CharField(max_length=15,choices=ORDER_STATUS,default='PENDING')
-
+    created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Đơn hàng #{self.id} - {self.customer.username})"

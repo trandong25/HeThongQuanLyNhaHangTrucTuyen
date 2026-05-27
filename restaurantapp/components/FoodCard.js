@@ -81,7 +81,12 @@ const FoodCard = ({item, onPress,onComparePress,isComparing}) => {
                     <View style={[Styles.row, Styles.metaContainer]}>
                         <View style={[Styles.row, Styles.metaItem]}>
                             <Icon source="star" size={14} color={COLORS.warning} />
-                            <Text style={Styles.metaText}>{item.rating || '4.9'}</Text>
+                            <Text style={Styles.metaText}>{item.avg_rating ? item.avg_rating : "-"}</Text>
+                            {item.review_count > 0 && (
+                                <Text style={[Styles.metaText, { color: '#999', fontSize: 10 }]}>
+                                    ({item.review_count})
+                                </Text>
+                            )}
                         </View>
                         <View style={Styles.row}>
                             <Icon source="clock-outline" size={14} color={COLORS.primary} />

@@ -17,6 +17,8 @@ export const endpoints = {
     'order-pay':    (id) => `/orders/${id}/pay/`,
     "login-proxy": "/login-proxy/",
     'ingredients': '/ingredients/',
+    'stats-dish':    '/stats/dish_stats/',
+    'stats-revenue': '/stats/revenue_by_day/',
 };
 
 export const authApis = (token) => {

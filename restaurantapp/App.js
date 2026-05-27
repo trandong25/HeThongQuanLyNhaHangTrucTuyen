@@ -24,6 +24,7 @@ import Payment from "./screens/Payment/Payment";
 import MyReservations from "./screens/Reservation/MyReservation";
 import CompareScreen from "./screens/Home/CompareScreen";
 import Review from "./screens/review/Review";
+import ChefStats from "./screens/Chef/ChefStats";
 
 
 const Stack = createNativeStackNavigator(); 
@@ -46,6 +47,11 @@ const ChefTabNavigator = () => {
         name="Tài khoản"
         component={Profile}
         options={{ tabBarIcon: ({color}) => <Icon source="account-check" size={26} color={color} />}}
+      />
+      <Tab.Screen
+        name="Thống kê"
+        component={ChefStats}
+        options={{ tabBarIcon: ({color}) => <Icon source="chart-bar" size={26} color={color} /> }}
       />
     </Tab.Navigator>
   )

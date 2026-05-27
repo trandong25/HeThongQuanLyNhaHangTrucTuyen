@@ -113,7 +113,7 @@ const MyReservations = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Appbar.Header>
-                <Appbar.BackAction onPress={() => navigation.goBack()} />
+                <Appbar.BackAction onPress={() => navigation.navigate('MainTabs', { screen: 'Trang chủ' })} />
                 <Appbar.Content title="Đặt bàn của tôi" titleStyle={{ fontWeight: 'bold' }} />
             </Appbar.Header>
             <FlatList

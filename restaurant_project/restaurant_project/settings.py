@@ -141,7 +141,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
 USE_I18N = True
 
@@ -175,17 +175,6 @@ MOMO_ACCESS_KEY = "F8BBA842ECF85"
 MOMO_SECRET_KEY = "K951B6PE1waDMi640xX08PD3vg6EkVlz"
 MOMO_ENDPOINT = "https://test-payment.momo.vn/v2/gateway/api/create"
 
-
-# from dotenv import load_dotenv
-# import os
-#
-# # load file .env
-# load_dotenv(BASE_DIR / ".env")
-#
-# # đọc env
-# GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-# GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-# JWT_SECRET = os.getenv("JWT_SECRET")
 
 
 
