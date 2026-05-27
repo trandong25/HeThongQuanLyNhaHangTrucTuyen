@@ -16,6 +16,10 @@ export default StyleSheet.create({
         backgroundColor: COLORS.background,
         padding: 20
     },
+    cont:{
+        flex: 1,
+        backgroundColor: COLORS.background,
+    },
     row: {
         flexDirection: "row"
     },
@@ -237,10 +241,6 @@ cartItem: {
         marginTop: -2 
     },
     //Search
-    container: { 
-        flex: 1, 
-        backgroundColor: "#fff" 
-    },
     searchRow: { 
         flexDirection: 'row', 
         alignItems: 'center', 
@@ -381,7 +381,6 @@ dropdown: {
         fontSize: 16,
     },
     //compare
-    container: { flex: 1, backgroundColor: '#fff', padding: 16 },
     headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-around',
