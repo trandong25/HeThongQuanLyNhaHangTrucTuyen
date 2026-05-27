@@ -16,7 +16,6 @@ import FoodDetail from "./screens/Home/FoodDetail";
 import { CartContext, MyUserContext } from "./configs/Contexts";
 import { CartReducer } from "./reducers/CartReducer";
 import Reservation from "./screens/Reservation/Reservation";
-import SearchScreen from "./screens/Search/SearchScreen";
 import Order from "./screens/Order/Order";
 import ChefHome from "./screens/Chef/ChefHome";
 import AddDish from "./screens/Chef/AddDish";
@@ -25,6 +24,9 @@ import MyReservations from "./screens/Reservation/MyReservation";
 import CompareScreen from "./screens/Home/CompareScreen";
 import Review from "./screens/review/Review";
 import ChefStats from "./screens/Chef/ChefStats";
+import ChefReviews from "./screens/Chef/ChefReviews";
+import SearchScreen from "./screens/Search/SearchScreen";
+
 
 
 const Stack = createNativeStackNavigator(); 
@@ -42,6 +44,11 @@ const ChefTabNavigator = () => {
         name="Quản lý"
         component={ChefHome}
         options={{ tabBarIcon: ({color}) => <Icon source="food-fork-drink" size={26} color={color} />}}
+      />
+       <Tab.Screen
+        name="Đánh giá"
+        component={ChefReviews}
+        options={{ tabBarIcon: ({color}) => <Icon source="star" size={26} color={color} />}}
       />
       <Tab.Screen
         name="Tài khoản"

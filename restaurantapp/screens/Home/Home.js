@@ -9,7 +9,6 @@ import CategoryList from "../../components/CategoryList.js";
 import { Alert } from "react-native";
 
 
-
 const Home = () => {
     const [categories, setCategories] = useState([]);
     const [dishes, setDishes] = useState([]);

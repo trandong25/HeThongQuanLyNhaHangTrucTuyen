@@ -43,32 +43,35 @@ const Profile = () => {
                     </Text>
                 </View>
 
-                <View style={{ backgroundColor: '#FFF', borderRadius: 15, elevation: 2, overflow: 'hidden' }}>
-                    <List.Item
-                        title="Lịch sử đặt bàn"
-                        description="Theo dõi trạng thái đặt bàn của bạn"
-                        left={props => <List.Icon {...props} icon="calendar-clock" color={COLORS.primary} />}
-                        right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => nav.navigate("MyReservations")}
-                    />
-                    <Divider />
-                    <List.Item
-                        title="Đơn gọi món"
-                        description="Xem các món ăn đang được chuẩn bị"
-                        left={props => <List.Icon {...props} icon="room-service-outline" color="#4CAF50" />}
-                        right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => nav.navigate("Order")}
-                    />
-                    <Divider />
-                    <List.Item
-                        title="Chat với nhà hàng"
-                        description="Hỗ trợ, tư vấn trực tiếp"
-                        left={props => <List.Icon {...props} icon="chat-processing-outline" color="#03A9F4" />}
-                        right={props => <List.Icon {...props} icon="chevron-right" />}
-                        onPress={() => nav.navigate("Chat")}
-                    />
-                    
-                </View>
+                {user?.role !== 'CHEF' &&(
+                    <>
+                    <View style={{ backgroundColor: '#FFF', borderRadius: 15, elevation: 2, overflow: 'hidden' }}>
+                        <List.Item
+                            title="Lịch sử đặt bàn"
+                            description="Theo dõi trạng thái đặt bàn của bạn"
+                            left={props => <List.Icon {...props} icon="calendar-clock" color={COLORS.primary} />}
+                            right={props => <List.Icon {...props} icon="chevron-right" />}
+                            onPress={() => nav.navigate("MyReservations")}
+                        />
+                        <Divider />
+                        <List.Item
+                            title="Đơn gọi món"
+                            description="Xem các món ăn đang được chuẩn bị"
+                            left={props => <List.Icon {...props} icon="room-service-outline" color="#4CAF50" />}
+                            right={props => <List.Icon {...props} icon="chevron-right" />}
+                            onPress={() => nav.navigate("Order")}
+                        />
+                        <Divider />
+                        <List.Item
+                            title="Chat với nhà hàng"
+                            description="Hỗ trợ, tư vấn trực tiếp"
+                            left={props => <List.Icon {...props} icon="chat-processing-outline" color="#03A9F4" />}
+                            right={props => <List.Icon {...props} icon="chevron-right" />}
+                            onPress={() => nav.navigate("Chat")}
+                        />
+                    </View>
+                </>
+                )}
                     <Button 
                     mode="contained" 
                     buttonColor="#fa5b52" 
