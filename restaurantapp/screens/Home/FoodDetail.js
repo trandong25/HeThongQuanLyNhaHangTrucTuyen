@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import APIs, { endpoints } from "../../configs/APIs"
 import { Alert, ScrollView, View, Image } from "react-native"
-import { ActivityIndicator, Avatar, Divider, Text } from "react-native-paper"
+import { ActivityIndicator, Avatar, Chip, Divider, Text } from "react-native-paper"
 
 const FoodDetail = ({ route }) => {
     const foodId = route.params?.foodId; 
@@ -75,6 +75,33 @@ const FoodDetail = ({ route }) => {
                     {parseInt(item.price).toLocaleString('vi-VN')}đ
                 </Text>
                 <Text variant="bodyMedium" style={{ color: '#666' }}>{item.description}</Text>
+                <Text variant="titleMedium" style={{ fontWeight: 'bold', marginBottom: 8 }}>
+                    Nguyên liệu thành phần
+                </Text>
+                {item.ingredients && Array.isArray(item.ingredients) && item.ingredients.length > 0 ? (
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                        {item.ingredients.map((ing, idx) => (
+                            <Chip 
+                                key={idx} 
+                                style={{ backgroundColor: '#F5F5F5' }}
+                                textStyle={{ color: '#444', fontSize: 13 }}
+                            >
+                                {ing.name || ing}
+                            </Chip>
+                        ))}
+                    </View>
+                ): typeof item.ingredients === 'string' ? (
+                    <Text variant="bodyMedium" style={{ color: '#555', lineHeight: 20 }}>
+                        {item.ingredients}
+                    </Text>
+                ):(
+                    <Text style={{ fontStyle: 'italic', color: '#999' }}>Thông tin nguyên liệu đang cập nhật.</Text>
+                )}
+                {item.chef && (
+                    <Text variant="bodySmall" style={{ fontSize: 16 ,color: '#777', marginTop: 6, fontStyle: 'italic' }}>
+                        👨‍🍳 Đầu bếp: {item.chef.first_name} 
+                    </Text>
+                )}
             </View>
 
             <Divider style={{ marginHorizontal: 16 }} />

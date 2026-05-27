@@ -92,8 +92,8 @@ const CompareScreen = () => {
             />
             <CompareRow
                 label="🧑‍🍳 Đầu bếp"
-                value1={dish1.chef?.name || 'N/A'}
-                value2={dish2.chef?.username || 'N/A'}
+                value1={dish1.chef?.first_name || 'N/A'}
+                value2={dish2.chef?.first_name || 'N/A'}
             />
             <CompareRow
                 label="🥬 Nguyên liệu"

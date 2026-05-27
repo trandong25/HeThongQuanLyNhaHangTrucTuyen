@@ -1,3 +1,4 @@
+from django.db.models.fields import DateField
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from django.core.serializers import serialize
@@ -8,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.functions import TruncDay
+from django.db.models.functions import TruncDay, TruncDate
 from oauthlib.uri_validate import query
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CompareDishSerializer, ReviewSerializer, IngredientSerializer
@@ -18,6 +19,9 @@ import requests
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models.functions import Cast
 
 
 class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
@@ -274,31 +278,40 @@ class CompareDishViewSet(viewsets.ViewSet):
 class StatsViewSet(viewsets.ViewSet):
     @action(methods=['get'], detail = False)
     def dish_stats(self,request):
-        data = OrderDetail.objects.values('dish__name')\
+        queryset=OrderDetail.objects.all()
+        if request.user.role == 'CHEF':
+            queryset=queryset.filter(dish__chef=request.user)
+
+        data = queryset.values('dish__name')\
         .annotate(
             total_quantity=Sum('quantity'),
             revenue=Sum(F('quantity') * F('unit_price'))
-        ).order_by('-total_quantity')
+        ).order_by('revenue')
         return Response(data)
 
-    @action(detail=False, methods=['get'])
-    def chefs(self,request):
-        data = OrderDetail.objects.values('dish__chef__username')\
-            .annotate(
-                total_quantity=Sum('quantity'),
-                revenue=Sum(F('quantity') * F('unit_price'))
-        )
-        return Response(data)
 
     @action(detail=False, methods=['get'])
     def revenue_by_day(self,request):
-        data = OrderDetail.objects.annotate(
-            day = TruncDay('order__created_date')
+        queryset = OrderDetail.objects.all()
+        if request.user.role == 'CHEF':
+            queryset = queryset.filter(dish__chef=request.user)
+
+        period = request.query_params.get('period','day')
+        now = timezone.now()
+        if period == 'day':
+            queryset = queryset.filter(order__created_date__gte=now - timedelta(days=1))
+        if period == 'week':
+            queryset = queryset.filter(order__created_date__gte=now - timedelta(days=7))
+        if period == 'month':
+            queryset = queryset.filter(order__created_date__gte =now - timedelta(days=30))
+
+        data = queryset.annotate(
+            day=Cast('order__created_date',DateField())
         ).values('day')\
-        .annotate(
-            revenue=Sum(F('quantity') * F('unit_price')),
-        ).order_by('day')
-        return Response(data)
+        .annotate(revenue = Sum(F('quantity') * F('unit_price')))\
+        .order_by('day')
+        return Response(list(data))
+
 
 class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()
@@ -323,11 +336,7 @@ def login_proxy(request):
         "client_secret": settings.CLIENT_SECRET,
         "grant_type": "password"
     }
-    print("👉 URL GỌI ĐẾN:", token_url)
-    print("👉 PAYLOAD GỬI ĐI:", payload)
-
     res = requests.post(token_url, data=payload)
-    print("👉 KẾT QUẢ TỪ OAUTH2:", res.text)
 
     return Response(res.json(), status=res.status_code)
 

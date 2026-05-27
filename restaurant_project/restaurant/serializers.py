@@ -179,16 +179,26 @@ class DishSerializer(serializers.ModelSerializer):
         queryset=Ingredient.objects.all()
     )
     chef = UserSerializer(read_only=True)
-    avg_rating = serializers.FloatField(read_only=True)
+    avg_rating = serializers.SerializerMethodField()
+    review_count = serializers.SerializerMethodField()
     class Meta:
         model = Dish
         fields = [
             'id', 'name', 'description', 'image',
             'price', 'ingredients', 'prep_time',
             'chef', 'category', 'avg_rating',
-            'created_date'
+            'created_date','review_count',
         ]
 
+    def get_avg_rating(self, obj):
+        avg = obj.reviews.aggregate(Avg('rating'))['rating__avg']
+        if avg:
+            return round(avg, 1)
+        else:
+            return None
+
+    def get_review_count(self, obj):
+        return obj.reviews.count()
     def to_representation(self, instance):
         data = super().to_representation(instance)
         data['ingredients'] = IngredientSerializer(instance.ingredients.all(), many=True).data
