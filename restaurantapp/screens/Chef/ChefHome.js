@@ -4,31 +4,55 @@ import Styles, { COLORS } from '../../styles/Styles';
 import APIs, { endpoints, authApis } from '../../configs/APIs'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
-
+import { Appbar, Divider, FAB } from 'react-native-paper';
+import CategoryList from '../../components/CategoryList';
 
 
 const ChefHome = () => {
+    const [categories, setCategories] = useState([]);
     const [dishes, setDishes] = useState([]);
+    const [selectedCate, setSelectedCate] = useState(null)
     const [loading, setLoading] = useState(false);
     const navigation = useNavigation();
 
+
+    const loadCategories = async () => {
+        try {
+            const res = await APIs.get(endpoints['categories']);
+            setCategories(res.data.results || res.data);
+        } catch (ex) {
+            console.error("Lỗi tải danh mục:", ex);
+        }
+    };
     const loadDishes = async () => {
             setLoading(true);
         try {
-            let res = await APIs.get(endpoints['dishes']);
-            
-            setDishes(res.data.results || res.data); 
-        } catch (ex) {
-            console.error("Lỗi tải danh sách món:", ex);
-            Alert.alert("Lỗi", "Không thể tải danh sách món ăn.");
+            let url = endpoints['dishes'];
+        if (selectedCate) {
+            url += `?category_id=${selectedCate}`;
+        }
+        let res = await APIs.get(url);
+        setDishes(res.data.results || res.data);
+    } catch (ex) {
+        console.error("Lỗi tải danh sách món:", ex);
+        Alert.alert("Lỗi", "Không thể tải danh sách món ăn.");
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        loadCategories();
+    }, []);
+
+    useEffect(() => {
+        loadDishes();
+    }, [selectedCate]);
+
     useEffect(() => {
             const unsubscribe = navigation.addListener('focus', loadDishes);
             return unsubscribe;
-        }, [navigation]);
+        }, [navigation,selectedCate]);
 
     const handleDelete = (id) => {
         Alert.alert(
@@ -63,7 +87,7 @@ const ChefHome = () => {
 
 
     const renderItem = ({ item }) => (
-        <View style={[Styles.row, Styles.cartItem, Styles.between, { padding: 15, marginHorizontal: 10 }]}>
+        <View style={[Styles.row, Styles.cartItem, Styles.between, { padding: 15, marginHorizontal: 20 }]}>
             <Image source={{ uri: item.image }} style={{ width: 60, height: 60, borderRadius: 10, }} />
             
             <View style={{ flex: 1, paddingHorizontal: 15 }}>
@@ -87,16 +111,16 @@ const ChefHome = () => {
         </View>
     );
     return (
-        <View style={Styles.container}>
-            <Text style={[Styles.subject, Styles.mb, {marginTop: 30, textAlign: 'center'}]}>Quản lý Thực Đơn</Text>
-            
-            <TouchableOpacity
-                style={[Styles.btnCate, Styles.padding, Styles.bradius, Styles.mb, { alignItems: 'center' }]}
-                onPress={() => navigation.navigate('AddDish')}
-            >
-                <Text style={Styles.btnCateText}>+ THÊM MÓN MỚI</Text>
-            </TouchableOpacity>
-
+        <View style={Styles.cont}>
+            <Appbar.Header style={{ backgroundColor: COLORS.primary, justifyContent: 'center' }}>
+                <Appbar.Content title="QUẢN LÝ THỰC ĐƠN" titleStyle={{color: 'white', fontWeight: 'bold', textAlign: 'center' }} />
+            </Appbar.Header>
+            <Divider style={{ marginBottom: 10 }} />
+             <CategoryList 
+                categories={categories} 
+                selectedCate={selectedCate} 
+                setSelectedCate={setSelectedCate} 
+           />
             {loading ? (
                 <ActivityIndicator size="large" color={COLORS.primary} />
             ) : (
@@ -108,7 +132,13 @@ const ChefHome = () => {
                     ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20 }}>Chưa có món ăn nào.</Text>}
                 />
             )}
+            <FAB
+            style={{ position: 'absolute', margin: 16, right: 0, bottom: 0 }}
+            icon="plus"
+            onPress={() => navigation.navigate('AddDish')}
+        />
         </View>
+        
     );
 
 }

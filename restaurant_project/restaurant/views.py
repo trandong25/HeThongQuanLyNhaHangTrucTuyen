@@ -73,6 +73,31 @@ class DishViewSet(viewsets.ModelViewSet):
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
 
+    @action(detail=False, methods=['get'], url_path='chef-reviews', permission_classes=[permissions.IsAuthenticated])
+    def chef_reviews(self, request):
+        user = request.user
+
+        if user.role != 'CHEF':
+            return Response({"detail": "Bạn không có quyền xem dữ liệu này."}, status=status.HTTP_403_FORBIDDEN)
+
+        reviews = Review.objects.filter(dish__chef=user).select_related('customer', 'dish').order_by('-created_date')
+
+        data = []
+        for r in reviews:
+            data.append({
+                "id": r.id,
+                "rating": r.rating,
+                "comment": r.comment,
+                "created_date": r.created_date,
+                "dish_name": r.dish.name,
+                "customer": {
+                    "username": r.customer.username,
+                    "avatar": r.customer.avatar.url if r.customer.avatar else None
+                }
+            })
+
+        return Response(data, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['get','post'], url_path='reviews')
     def reviews(self, request, pk=None):
         dish = self.get_object()

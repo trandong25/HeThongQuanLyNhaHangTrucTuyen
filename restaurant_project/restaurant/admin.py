@@ -77,16 +77,21 @@ class MyAdminSite(admin.AdminSite):
 
     def get_urls(self):
         return [
-            path('restaurant-stats/', self.admin_view(self.restaurant_stats)),
+            path('restaurant-stats/', self.admin_view(self.restaurant_stats), name='restaurant_stats'),
         ]+super().get_urls()
 
     def restaurant_stats(self,request):
         category_stats = Category.objects.annotate(total_dishes=Count('dishes')).values('id', 'name', 'total_dishes')
         revenue_stats = Order.objects.values('status').annotate(total_revenue=Sum('total_amount'))
+        reservation_stats = Reservation.objects.values('status').annotate(total=Count('id'))
+        reservation_stats_by_date = Reservation.objects.extra(select={'date': 'date(reservation_time)'}).values(
+            'date').annotate(total=Count('id')).order_by('date')
 
         return TemplateResponse(request, 'admin/stats.html', {
             'category_stats': category_stats,
-            'revenue_stats': revenue_stats
+            'revenue_stats': revenue_stats,
+            'reservation_stats': reservation_stats,
+            'reservation_stats_by_date': reservation_stats_by_date,
         })
 
 admin_site = MyAdminSite()

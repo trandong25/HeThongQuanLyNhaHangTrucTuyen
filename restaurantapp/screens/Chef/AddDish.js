@@ -180,7 +180,7 @@ const AddDish = ({ route, navigation }) => {
     // Render item cho Dropdown
     const renderItem = (item) => (
         <View style={Styles.item}>
-            <Text style={styles.textItem}>{item.name}</Text>
+            <Text style={Styles.textItem}>{item.name}</Text>
             {item.id === selectedCategory && (
                 <AntDesign name="check" size={20} color={COLORS.primary} />
             )}
@@ -189,8 +189,8 @@ const AddDish = ({ route, navigation }) => {
 
     // Render item cho MultiSelect
     const renderMultiItem = (item, selected) => (
-        <View style={styles.item}>
-            <Text style={styles.textItem}>{item.name}</Text>
+        <View style={Styles.item}>
+            <Text style={Styles.textItem}>{item.name}</Text>
             {selected && <AntDesign name="check" size={20} color={COLORS.primary} />}
         </View>
     );

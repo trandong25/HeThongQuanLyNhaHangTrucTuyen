@@ -7,7 +7,6 @@ import Styles, { COLORS } from "../../styles/Styles";
 import FoodCard from "../../components/FoodCard";
 import CategoryList from "../../components/CategoryList.js";
 import { Alert } from "react-native";
-import { SearchBar } from "react-native-screens";
 
 
 const Home = () => {
@@ -116,7 +115,7 @@ const Home = () => {
                 style={Styles.padding}
             >
                 <View style={Styles.padding}>
-                    <SearchBar style={Styles.search} value={q} onChangeText={setQ} placeholder="Tìm món ăn..." />
+                    <Searchbar style={Styles.search} value={q} onChangeText={setQ} placeholder="Tìm món ăn..." />
                 </View> 
             </TouchableOpacity>
            
