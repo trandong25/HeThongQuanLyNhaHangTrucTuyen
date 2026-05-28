@@ -225,10 +225,17 @@ export default StyleSheet.create({
     },
     price: { color: "#E65100", fontWeight: "bold", fontSize: 14 },
     addBtn: {
-        backgroundColor: "#E65100", borderRadius: 20,
-        width: 28, height: 28, justifyContent: "center", alignItems: "center",
+        backgroundColor: "#E65100", 
+        borderRadius: 20,
+        width: 28, height: 28, 
+        justifyContent: "center", 
+        alignItems: "center",
     },
-    addBtnText: { color: "#fff", fontSize: 20, lineHeight: 26 },
+    addBtnText: { 
+        color: "#fff", 
+        fontSize: 20, 
+        lineHeight: 26 
+    },
 
     reviewInputContainer: { padding: 16 },
     starRatingRow: { flexDirection: "row", alignItems: "center", marginVertical: 12 },

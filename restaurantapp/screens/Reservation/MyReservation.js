@@ -93,7 +93,7 @@ const MyReservations = ({ navigation }) => {
                                     orderDetails: orderDetails || [] 
                                 })}
                             >
-                                ⭐ Đánh giá sản phẩm
+                                ⭐ Đánh giá món ăn 
                             </Button>
                         </View>
                     </>

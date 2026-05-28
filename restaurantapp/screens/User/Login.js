@@ -1,23 +1,10 @@
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useContext, useState } from "react";
-
-import {
-    Button,
-    HelperText,
-    TextInput
-} from "react-native-paper";
-
+import {Button,HelperText,TextInput} from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { useNavigation } from "@react-navigation/native";
-
 import Styles from "./Styles";
-
-import Apis, {
-    authApis,
-    endpoints
-} from "../../configs/APIs";
-
+import Apis, {authApis,endpoints} from "../../configs/APIs";
 import { MyUserContext } from "../../configs/Contexts";
 
 const Login = () => {
