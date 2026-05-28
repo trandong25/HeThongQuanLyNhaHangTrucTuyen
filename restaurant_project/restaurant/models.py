@@ -20,7 +20,7 @@ class User(AbstractUser):
     ]
     avatar = CloudinaryField(null =True)
     phone_number = models.CharField(max_length=15, null = True, blank=True)
-    role = models.CharField(max_length=10, choices= ROLE_CHOICES, default="CUSTOMER")
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="CUSTOMER")
     is_approved = models.BooleanField(default=False)
 
 class Category(BaseModel):
@@ -100,10 +100,9 @@ class Order(BaseModel):
     reservation = models.ForeignKey(Reservation,on_delete=models.SET_NULL, null=True, blank=True)
     total_amount = models.DecimalField(max_digits=12,decimal_places=2,default=0)
     status = models.CharField(max_length=15,choices=ORDER_STATUS,default='PENDING')
-    created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Đơn hàng #{self.id} - {self.customer.username})"
+        return f"Đơn hàng #{self.id} - {self.customer.username}"
 
 class OrderDetail(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='details')

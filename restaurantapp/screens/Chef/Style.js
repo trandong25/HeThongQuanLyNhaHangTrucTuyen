@@ -24,21 +24,6 @@ export default StyleSheet.create({
     selectedTextStyle: {
         fontSize: 16,
     },
-    container:{ 
-            flex: 1,
-            backgroundColor: '#f5f5f5' 
-    },
-    center: { 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center' 
-    },
-    card: { 
-        marginBottom: 15, 
-        backgroundColor: '#FFF', 
-        elevation: 2, 
-        borderRadius: 10 
-    },
     headerRow: { 
         flexDirection: 'row', 
         alignItems: 'center' 
@@ -75,5 +60,111 @@ export default StyleSheet.create({
         textAlign: 'center', 
         marginTop: 40, 
         color: 'gray' 
-    }
+    },
+    container: { 
+        flex: 1, 
+        backgroundColor: '#f5f5f5' 
+    },
+
+    center: { 
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center' 
+    },
+
+    header: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        padding: 16,
+        color: COLORS.primary,
+        paddingTop: 30,
+    },
+
+    summaryRow: {
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        gap: 12,
+    },
+
+    summaryCard: {
+        flex: 1,
+        backgroundColor: '#fff',
+        elevation: 2,
+    },
+
+    summaryLabel: { 
+        fontSize: 12, 
+        color: '#666', 
+        marginBottom: 4 
+    },
+
+    summaryValue: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: COLORS.primary,
+    },
+
+    card: {
+        marginBottom: 15, 
+        margin: 16,
+        marginTop: 0,
+        backgroundColor: '#fff',
+        elevation: 2,
+        borderRadius: 12,
+    },
+
+    cardTitle: { 
+        fontWeight: 'bold', 
+        fontSize: 15, 
+        marginBottom: 4 
+    },
+
+    empty: {
+        color: '#999',
+        fontStyle: 'italic',
+        textAlign: 'center',
+        padding: 20,
+    },
+
+    dishRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+    },
+
+    rank: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        backgroundColor: COLORS.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+
+    rankText: { 
+        color: '#fff', 
+        fontWeight: 'bold', 
+        fontSize: 12 
+    },
+
+    dishName: { 
+        fontWeight: '600', 
+        fontSize: 14 
+    },
+
+    dishSub: { 
+        color: '#888', 
+        fontSize: 12 
+    },
+
+    revenue: { 
+        color: COLORS.primary, 
+        fontWeight: 'bold' 
+    },
+        
+    
+
 });
