@@ -39,7 +39,6 @@ const ChefHome = () => {
                 if (selectedCate) {
                     url += `&category_id=${selectedCate}`;
                 }
-
                 let res = await authApis(token).get(url); 
 
                 if (page === 1) {
