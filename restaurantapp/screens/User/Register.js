@@ -47,7 +47,6 @@ const Register = () => {
 
     const nav = useNavigation();
 
-    // chọn ảnh
     const picker = async () => {
         let { status } =
             await ImgPicker.requestMediaLibraryPermissionsAsync();
@@ -67,7 +66,6 @@ const Register = () => {
         }
     };
 
-    // validate
     const validate = () => {
           setErr("");
         for (let i of userInfo) {
@@ -77,13 +75,11 @@ const Register = () => {
             }
         }
 
-        // kiểm tra avatar
         if (!user.avatar) {
             setErr("Vui lòng chọn ảnh đại diện!");
             return false;
         }
 
-        // kiểm tra password
         if (user.password !== user.confirm) {
             setErr("Mật khẩu không khớp!");
             return false;
@@ -92,7 +88,6 @@ const Register = () => {
         return true;
     };
 
-    // register
     const register = async () => {
         if (validate() === true) {
             setErr("");
@@ -146,7 +141,7 @@ const Register = () => {
                 
 
                 if (ex.response) {
-                    console.log("👉 ĐÂY LÀ LỖI TỪ DJANGO:", ex.response.data);
+                    console.log(" LỖI TỪ DJANGO:", ex.response.data);
                     setErr("Username đã tồn tại!");
                 } else {
                     setErr("Không thể kết nối server!");
@@ -166,7 +161,6 @@ const Register = () => {
         <Text style={Styles.title}>Tạo tài khoản ✨</Text>
         <Text style={Styles.subtitle}>Đăng ký để bắt đầu trải nghiệm</Text>
 
-        {/* Tabs */}
         <View style={Styles.tabContainer}>
             <TouchableOpacity style={Styles.tab} onPress={() => nav.navigate("Login")}>
                 <Text style={Styles.tabText}>Đăng nhập</Text>
@@ -229,7 +223,6 @@ const Register = () => {
          />
         
 
-        {/* Avatar Picker */}
         <TouchableOpacity style={Styles.avatarPicker} onPress={picker}>
             <Text style={Styles.avatarText}>📷 Chọn ảnh đại diện</Text>
         </TouchableOpacity>

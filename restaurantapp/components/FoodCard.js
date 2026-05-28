@@ -4,6 +4,7 @@ import Styles ,{COLORS} from "../styles/Styles"
 import { useContext } from "react"
 import { CartContext, MyUserContext } from "../configs/Contexts"
 import { useNavigation } from "@react-navigation/native";
+import Style from "./Style"
 
 
 
@@ -39,24 +40,24 @@ const FoodCard = ({item, onPress,onComparePress,isComparing}) => {
         }
     }
     return (
-        <TouchableOpacity style={Styles.cardWrapper} activeOpacity={0.8} onPress={onPress}>
+        <TouchableOpacity style={Style.cardWrapper} activeOpacity={0.8} onPress={onPress}>
             <Card style={[
-                Styles.foodCard,
+                Style.foodCard,
                 isComparing ? { borderColor: '#E65100' } : {}
                     
             ]}>
                 <View style={{ position: 'relative', width: '100%'}}>
                     <Card.Cover
                         source={{ uri: item.image }}
-                        style={Styles.foodImage}
+                        style={Style.foodImage}
                     />
-                    <View style={Styles.hotBadge}>
-                        <Text style={Styles.hotBadgeText}>HOT</Text>
+                    <View style={Style.hotBadge}>
+                        <Text style={Style.hotBadgeText}>HOT</Text>
                     </View>
                     <TouchableOpacity 
                         onPress={onComparePress} 
                         style={[
-                            Styles.btnCompare,
+                            Style.btnCompare,
                             isComparing ? { backgroundColor: '#E65100' } : {}
                         ]}
                     >
@@ -69,32 +70,32 @@ const FoodCard = ({item, onPress,onComparePress,isComparing}) => {
 
                 </View>
 
-                <Card.Content style={Styles.cardContent}>
+                <Card.Content style={Style.cardContent}>
                     <Text variant="titleMedium" numberOfLines={1} style={Styles.foodName}>
                         {item.name}
                     </Text>
                     
-                    <Text variant="bodySmall" style={Styles.foodChef}>
+                    <Text variant="bodySmall" style={Style.foodChef}>
                         👨‍🍳 Đầu bếp {item.chef?.first_name  || "Đồng"}
                     </Text>
                     
-                    <View style={[Styles.row, Styles.metaContainer]}>
-                        <View style={[Styles.row, Styles.metaItem]}>
+                    <View style={[Styles.row, Style.metaContainer]}>
+                        <View style={[Styles.row, Style.metaItem]}>
                             <Icon source="star" size={14} color={COLORS.warning} />
-                            <Text style={Styles.metaText}>{item.avg_rating ? item.avg_rating : "-"}</Text>
+                            <Text style={Style.metaText}>{item.avg_rating ? item.avg_rating : "-"}</Text>
                             {item.review_count > 0 && (
-                                <Text style={[Styles.metaText, { color: '#999', fontSize: 10 }]}>
+                                <Text style={[Style.metaText, { color: '#999', fontSize: 10 }]}>
                                     ({item.review_count})
                                 </Text>
                             )}
                         </View>
                         <View style={Styles.row}>
                             <Icon source="clock-outline" size={14} color={COLORS.primary} />
-                            <Text style={Styles.metaText}>{item.prep_time || '20'} phút</Text>
+                            <Text style={Style.metaText}>{item.prep_time || '20'} phút</Text>
                         </View>
                     </View>
 
-                    <View style={[Styles.row, Styles.priceRow]}>
+                    <View style={[Styles.row, Style.priceRow]}>
                         <Text style={Styles.priceText} >
                             {formatPrice(item.price)}đ
                         </Text>

@@ -2,7 +2,6 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
 
-    // ===== Layout =====
     container: {
         flex: 1,
         backgroundColor: "#FFF8F5",
@@ -40,7 +39,6 @@ export default StyleSheet.create({
         position: "relative",
     },
 
-    // ===== Text =====
     title: {
         fontSize: 28,
         fontWeight: "bold",
@@ -54,7 +52,6 @@ export default StyleSheet.create({
         marginBottom: 24,
     },
 
-    // ===== Tabs =====
     tabContainer: {
         flexDirection: "row",
         backgroundColor: "#F2E8E3",
@@ -91,7 +88,6 @@ export default StyleSheet.create({
         color: "#888",
     },
 
-    // ===== Input =====
     input: {
         marginBottom: 12,
         backgroundColor: "#fff",
@@ -102,7 +98,6 @@ export default StyleSheet.create({
         borderColor: "#E8D9D0",
     },
 
-    // ===== Divider =====
     divider: {
         flexDirection: "row",
         alignItems: "center",
@@ -121,7 +116,6 @@ export default StyleSheet.create({
         fontSize: 13,
     },
 
-    // ===== Buttons =====
     loginBtn: {
         marginTop: 8,
         borderRadius: 12,
@@ -148,7 +142,6 @@ export default StyleSheet.create({
         paddingVertical: 4,
     },
 
-    // ===== Forgot Password =====
     forgot: {
         textAlign: "right",
         color: "#FF5500",
@@ -156,7 +149,6 @@ export default StyleSheet.create({
         marginBottom: 8,
     },
 
-    // ===== Avatar =====
     avatar: {
         width: 100,
         height: 100,
@@ -182,7 +174,6 @@ export default StyleSheet.create({
         fontWeight: "bold",
     },
 
-    // ===== Profile =====
     coverBackground: { width: "100%", height: 200 },
     overlay: {
         flex: 1,
@@ -219,7 +210,6 @@ export default StyleSheet.create({
     menuCard: { backgroundColor: "#fff", borderRadius: 12, elevation: 1, overflow: "hidden" },
     logoutBtn: { borderRadius: 8, marginTop: 25, marginBottom: 35, paddingVertical: 4 },
 
-    // ===== FoodCard =====
     cardContainer: { margin: 6 },
     bradius: { borderRadius: 12 },
     foodImage: { height: 130, borderTopLeftRadius: 12, borderTopRightRadius: 12 },
@@ -240,7 +230,6 @@ export default StyleSheet.create({
     },
     addBtnText: { color: "#fff", fontSize: 20, lineHeight: 26 },
 
-    // ===== Review =====
     reviewInputContainer: { padding: 16 },
     starRatingRow: { flexDirection: "row", alignItems: "center", marginVertical: 12 },
     starCharacter: { fontSize: 32, marginRight: 4 },

@@ -51,14 +51,14 @@ const ChefTabNavigator = () => {
         options={{ tabBarIcon: ({color}) => <Icon source="star" size={26} color={color} />}}
       />
       <Tab.Screen
-        name="Tài khoản"
-        component={Profile}
-        options={{ tabBarIcon: ({color}) => <Icon source="account-check" size={26} color={color} />}}
-      />
-      <Tab.Screen
         name="Thống kê"
         component={ChefStats}
         options={{ tabBarIcon: ({color}) => <Icon source="chart-bar" size={26} color={color} /> }}
+      />
+      <Tab.Screen
+        name="Tài khoản"
+        component={Profile}
+        options={{ tabBarIcon: ({color}) => <Icon source="account-check" size={26} color={color} />}}
       />
     </Tab.Navigator>
   )
