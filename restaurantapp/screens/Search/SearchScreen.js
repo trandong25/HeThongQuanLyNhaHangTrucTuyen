@@ -78,7 +78,7 @@ const SearchScreen = () => {
     };
 
     return (
-        <View style={Styles.container}>
+        <View style={Styles.cont}>
             <View style={Styles.searchRow}>
                 <TextInput 
                     style={Styles.nativeSearchbar}

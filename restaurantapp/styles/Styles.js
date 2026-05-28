@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 export const COLORS = {
     primary: '#E65100',
     primaryLight: '#FF6D00',
-    backgroundLight: '#eee4dc',
+    backgroundLight: '#f3ede9',
     background: '#FFFFFF',
     textMain: '#333333',
     textSub: '#777777',
@@ -12,12 +12,12 @@ export const COLORS = {
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
-        padding: 20
+        backgroundColor: COLORS.backgroundLight,
     },
     cont:{
         flex: 1,
-        backgroundColor: COLORS.background,
+        backgroundColor: COLORS.backgroundLight,
+        padding: 13
     },
     row: {
         flexDirection: "row"
@@ -143,7 +143,9 @@ cartItem: {
         flexDirection: 'row', 
         alignItems: 'center', 
         paddingHorizontal: 16, 
-        paddingTop: 12 },
+        paddingTop: 10,
+        marginTop: 20,
+    },
     nativeSearchbar: { 
         flex: 1, 
         height: 45, 
@@ -151,7 +153,7 @@ cartItem: {
         borderRadius: 8, 
         paddingHorizontal: 12, 
         color: '#000',
-        fontSize: 15
+        fontSize: 15,
     },
     filterButton: { 
         marginLeft: 10, 
