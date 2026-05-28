@@ -45,7 +45,6 @@ const Login = () => {
 
     const [, dispatch] = useContext(MyUserContext);
 
-    // validate
     const validate = () => {
 
         setErr("");
@@ -60,7 +59,6 @@ const Login = () => {
         return true;
     };
 
-    // login
     const login = async () => {
         if (validate() === false) return;
 
@@ -76,29 +74,24 @@ const Login = () => {
 
             const accessToken = res.data.access_token;
 
-            // Lấy thông tin user
             let u = await authApis(accessToken).get(endpoints["current-user"]);
             const loggedInUser = u.data;
 
-            // Kiểm tra chef chưa được duyệt
             if (loggedInUser.role === 'CHEF' && !loggedInUser.is_approved) {
                 Alert.alert("Thông báo", "🔒 Tài khoản Đầu bếp đang chờ Admin phê duyệt!");
                 return; 
             }
 
-            // Lưu token
             await AsyncStorage.setItem("token", accessToken);
 
             Alert.alert("Thành công", "🎉 Đăng nhập thành công!");
             nav.navigate("Home");
 
-            // Dispatch — context tự chuyển màn hình
             dispatch({ type: "LOGIN", payload: loggedInUser });
              const pending = await AsyncStorage.getItem('pendingPayment');
             if (pending) {
-                await AsyncStorage.removeItem('pendingPayment'); // Xóa sau khi lấy
+                await AsyncStorage.removeItem('pendingPayment'); 
                 const params = JSON.parse(pending);
-                // Chuyển về Payment với params đã lưu
                 nav.navigate('Reservation', {
                     screen: 'Payment',
                     params: params,
@@ -144,7 +137,6 @@ const Login = () => {
 
             </View>
 
-            {/* Facebook */}
             <Button
                 mode="contained"
                 icon="facebook"
@@ -153,7 +145,6 @@ const Login = () => {
                 Tiếp tục với Facebook
             </Button>
 
-            {/* Google */}
             <Button
                 mode="outlined"
                 icon="google"
@@ -162,7 +153,6 @@ const Login = () => {
                 Tiếp tục với Google
             </Button>
 
-            {/* Divider */}
             <View style={Styles.divider}>
                 <View style={Styles.line} />
 
@@ -173,7 +163,6 @@ const Login = () => {
                 <View style={Styles.line} />
             </View>
 
-            {/* Error */}
             {
                 err && (
                     <HelperText
@@ -185,7 +174,6 @@ const Login = () => {
                 )
             }
 
-            {/* Inputs */}
             {userInfo.map((i) => (
                 <TextInput
                     key={i.field}
@@ -209,12 +197,10 @@ const Login = () => {
                 />
             ))}
 
-            {/* Forgot */}
             <Text style={Styles.forgot}>
                 Quên mật khẩu?
             </Text>
 
-            {/* Login */}
             <Button
                 mode="contained"
                 loading={loading}
