@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
 
-//Màu app
 export const COLORS = {
     primary: '#E65100',
     primaryLight: '#FF6D00',
@@ -26,87 +25,16 @@ export default StyleSheet.create({
     center:{
         justifyContent: 'center',
         alignItems: 'center',
-    },  cont: {
-        flex: 1,
-        marginTop: 50
-    },between :{
+    },  
+    between :{
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-//FoodCard
-cardWrapper: {
-        flex: 0.5,
-        padding: 6
-    },
-    foodCard: {
-        borderRadius: 15,
-        overflow: 'hidden',
-        backgroundColor: COLORS.background,
-        elevation: 3
-    },
-    foodImage: {
-        borderTopLeftRadius: 15,
-        borderTopRightRadius: 15,
-    },
-    btnCompare: {
-        position: 'absolute',
-        top: 8,
-        right: 8,
-        backgroundColor: '#fff',
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        justifyContent: 'center',
-        borderColor: '#E65100',
-        borderWidth: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 2,
-    },
-    hotBadge: {
-        position: 'absolute',
-        top: 8,
-        left: 8,
-        backgroundColor: COLORS.primaryLight,
-        paddingHorizontal: 8,
-        paddingVertical: 3,
-        borderRadius: 8,
-        zIndex: 2,
-        
-    },
-    hotBadgeText: {
-        color: COLORS.background,
-        fontSize: 10,
-        fontWeight: 'bold'
-    },
-    cardContent: {
-        paddingVertical: 12,
-        paddingHorizontal: 10
-    },
+
     foodName: {
         fontWeight: 'bold',
         color: COLORS.textMain,
         marginBottom: 2
-    },
-    foodChef: {
-        color: COLORS.textSub,
-        marginBottom: 8
-    },
-    metaContainer: {
-        marginBottom: 12
-    },
-    metaItem: {
-        marginRight: 15
-    },
-    metaText: {
-        marginLeft: 4,
-        color: COLORS.textSub,
-        fontSize: 12
-    },
-    priceRow: {
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-        alignItems: 'center'
     },
     priceText: {
         fontSize: 16,
@@ -121,7 +49,7 @@ cardWrapper: {
         justifyContent: 'center',
         alignItems: 'center'
     },
-//Cart
+
 cartItem: {
         marginBottom: 10,
         borderRadius: 12,
@@ -142,40 +70,22 @@ cartItem: {
         marginTop: 15,
         elevation: 2
     },
-///Home
+
     search: {
         color: "black",
         backgroundColor: COLORS.background,
     },
-    btnCate:{
-        backgroundColor: COLORS.primaryLight
-    },
     btnCateText:{
         color: COLORS.background
     },
-    /////
+
     mt: {
         marginTop: 10
     },
     mb: {
         marginBottom: 10
     },
-
-    mt: {
-        marginTop: 10
-    },
-
-    mb: {
-        marginBottom: 10
-    },
-
-    center: {
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    row: {
-        flexDirection: "row"
-    }, wrap: {
+     wrap: {
         flexWrap: "wrap"
     }, padding: {
         padding: 5
@@ -201,18 +111,12 @@ cartItem: {
         backgroundColor: '#E65100'
     },bradius:{
         borderRadius:10
-    },cardContainer: {
-        flex: 1,
-        margin: 8,
-    },relative:{
+    },
+    relative:{
         position:'relative'
     },btnCate: {
         backgroundColor:'#E65100',
         color: 'white'
-    },
-
-    row: {
-        flexDirection: "row"
     },
 
     shadow: {
@@ -227,12 +131,6 @@ cartItem: {
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-    },relative: {
-        position: 'relative'
-    },
-    shadow: {
-        elevation: 5,
-        shadowColor: "#000"
     },
     addBtnText: {
         color: '#fff',
@@ -240,7 +138,7 @@ cartItem: {
         fontWeight: 'bold',
         marginTop: -2 
     },
-    //Search
+
     searchRow: { 
         flexDirection: 'row', 
         alignItems: 'center', 
@@ -354,33 +252,6 @@ cartItem: {
     footerAmount: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
     confirmBtn: { borderRadius: 10 },
 
-
-
-
-//add dish
-dropdown: {
-        marginVertical: 8,
-        backgroundColor: '#f5f5f5',
-        borderRadius: 10,
-        paddingHorizontal: 15,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        height: 50,
-    },
-    item: {
-        padding: 15,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    textItem: {
-        flex: 1,
-        fontSize: 16,
-    },
-    selectedTextStyle: {
-        fontSize: 16,
-    },
-    //compare
     headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-around',
@@ -426,7 +297,6 @@ dropdown: {
     winnerText: {
         color: '#E65100', fontWeight: 'bold',
     },
-    actionRow: { marginBottom: 30 },
     btn: { borderRadius: 10 },
     actionRow: {
         flexDirection: 'row',

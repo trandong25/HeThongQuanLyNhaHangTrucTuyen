@@ -5,6 +5,7 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import * as ImgPicker from 'expo-image-picker';
 import Styles, { COLORS } from '../../styles/Styles';
+import Style from './Style';
 import APIs,{ endpoints, authApis } from '../../configs/APIs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -24,7 +25,6 @@ const AddDish = ({ route, navigation }) => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedIngredients, setSelectedIngredients] = useState([]);
 
-    // Load categories và ingredients từ API
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -67,7 +67,6 @@ const AddDish = ({ route, navigation }) => {
         }
     }, [dishId]);
 
-    // Chọn ảnh
     const picker = async () => {
         const { status } = await ImgPicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
@@ -80,7 +79,6 @@ const AddDish = ({ route, navigation }) => {
         }
     };
 
-    // Hàm xử lý khi chọn nguyên liệu từ MultiSelect
     const handleIngredientsChange = async (selectedItems) => {
     const token = await AsyncStorage.getItem('token');
     const api = authApis(token);
@@ -90,18 +88,15 @@ const AddDish = ({ route, navigation }) => {
         const id = item?.id ?? item;
         const name = item?.name;
 
-        // Nếu id là số và có trong danh sách ingredients hiện tại -> đã tồn tại
         if (typeof id === 'number' && ingredients.some(ing => ing.id === id)) {
             finalIds.push(id);
         } else {
-            // Nguyên liệu mới: lấy tên từ id (nếu id là chuỗi) hoặc từ item.name
             const ingredientName = typeof id === 'string' ? id : name;
             if (!ingredientName) continue;
 
             try {
                 const res = await api.post('/ingredients/', { name: ingredientName });
                 finalIds.push(res.data.id);
-                // Cập nhật state ingredients để hiển thị và dùng sau
                 setIngredients(prev => [...prev, { id: res.data.id, name: ingredientName }]);
             } catch (ex) {
                 console.error('Lỗi tạo nguyên liệu:', ex);
@@ -113,7 +108,6 @@ const AddDish = ({ route, navigation }) => {
     setSelectedIngredients(finalIds);
 };
 
-    // Validate
     const validate = () => {
         if (!dish.name || !dish.price || !dish.prep_time) {
             setErr('Vui lòng nhập tên, giá và thời gian chuẩn bị!');
@@ -127,7 +121,6 @@ const AddDish = ({ route, navigation }) => {
         return true;
     };
 
-    // Lưu món
     const saveDish = async () => {
         if (!validate()) return;
 
@@ -177,20 +170,18 @@ const AddDish = ({ route, navigation }) => {
         }
     };
 
-    // Render item cho Dropdown
     const renderItem = (item) => (
-        <View style={Styles.item}>
-            <Text style={Styles.textItem}>{item.name}</Text>
+        <View style={Style.item}>
+            <Text style={Style.textItem}>{item.name}</Text>
             {item.id === selectedCategory && (
                 <AntDesign name="check" size={20} color={COLORS.primary} />
             )}
         </View>
     );
 
-    // Render item cho MultiSelect
     const renderMultiItem = (item, selected) => (
-        <View style={Styles.item}>
-            <Text style={Styles.textItem}>{item.name}</Text>
+        <View style={Style.item}>
+            <Text style={Style.textItem}>{item.name}</Text>
             {selected && <AntDesign name="check" size={20} color={COLORS.primary} />}
         </View>
     );
@@ -244,10 +235,9 @@ const AddDish = ({ route, navigation }) => {
                     onChangeText={(text) => setDish({ ...dish, description: text })}
                 />
 
-                {/* Danh mục */}
                 <Text style={{ marginTop: 10, marginBottom: 5, fontWeight: 'bold' }}>Danh mục:</Text>
                 <Dropdown
-                    style={Styles.dropdown}
+                    style={Style.dropdown}
                     data={categories}
                     labelField="name"
                     valueField="id"
@@ -255,13 +245,12 @@ const AddDish = ({ route, navigation }) => {
                     value={selectedCategory}
                     onChange={item => setSelectedCategory(item.id)}
                     renderItem={renderItem}
-                    selectedTextStyle={Styles.selectedTextStyle}
+                    selectedTextStyle={Style.selectedTextStyle}
                 />
 
-                {/* Nguyên liệu (MultiSelect có thể thêm mới) */}
                 <Text style={{ marginTop: 15, marginBottom: 5, fontWeight: 'bold' }}>Nguyên liệu:</Text>
                 <MultiSelect
-                    style={Styles.dropdown}
+                    style={Style.dropdown}
                     data={ingredients}
                     labelField="name"
                     valueField="id"
@@ -269,7 +258,7 @@ const AddDish = ({ route, navigation }) => {
                     value={selectedIngredients}
                     onChange={handleIngredientsChange}
                     renderItem={renderMultiItem}
-                    selectedTextStyle={Styles.selectedTextStyle}
+                    selectedTextStyle={Style.selectedTextStyle}
                     search
                     searchPlaceholder="Tìm nguyên liệu..."
                     visibleSelectedItem={false}
@@ -277,7 +266,6 @@ const AddDish = ({ route, navigation }) => {
                     onCreate={(name) => ({ id: name, name: name })}
                 />
 
-                {/* Hiển thị Chip các nguyên liệu đã chọn */}
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 10 }}>
                     {selectedIngredients.map(id => {
                         const ing = ingredients.find(i => i.id === id);
@@ -294,7 +282,6 @@ const AddDish = ({ route, navigation }) => {
                     })}
                 </View>
 
-                {/* Ảnh */}
                 <TouchableOpacity onPress={picker} style={{ marginTop: 15 }}>
                     <Text style={{ color: COLORS.primary, fontWeight: 'bold' }}>
                         {image ? 'Đổi ảnh khác...' : 'Chọn ảnh món ăn...'}
@@ -311,7 +298,6 @@ const AddDish = ({ route, navigation }) => {
                 )}
             </ScrollView>
 
-            {/* Nút cố định dưới cùng */}
             <View style={{
                 position: 'absolute',
                 bottom: 0,

@@ -100,7 +100,7 @@ export default StyleSheet.create({
         marginHorizontal: 10,
     },
     highlight: {
-        color: "#28A745", // Màu xanh lá cho thông số tốt hơn
+        color: "#28A745",
         fontWeight: "bold",
     },
 })

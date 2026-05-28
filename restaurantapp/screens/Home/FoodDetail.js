@@ -9,7 +9,6 @@ const FoodDetail = ({ route }) => {
     const [item, setItem] = useState(null);
     const [loadingDetail, setLoadingDetail] = useState(true);
     
-    // Giữ lại state cho danh sách reviews
     const [reviews, setReviews] = useState([]);
     const [loadingReviews, setLoadingReviews] = useState(false);
 
@@ -26,7 +25,6 @@ const FoodDetail = ({ route }) => {
         }
     };
 
-    // Giữ lại hàm load reviews
     const loadReviews = async () => {
         try {
             setLoadingReviews(true);

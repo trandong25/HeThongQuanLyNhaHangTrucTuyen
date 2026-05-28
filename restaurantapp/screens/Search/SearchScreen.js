@@ -12,14 +12,12 @@ const SearchScreen = () => {
     const [page, setPage] = useState(1);
     const nav = useNavigation();
 
-    // Các tiêu chí tìm kiếm nâng cao theo yêu cầu đề bài
     const [q, setQ] = useState("");
     const [chef, setChef] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
     const [maxTime, setMaxTime] = useState("");
     const [ordering, setOrdering] = useState("name"); 
 
-    // Trạng thái ẩn/hiện bộ lọc và bộ chọn sắp xếp
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [showSortOptions, setShowSortOptions] = useState(false);
 
@@ -29,7 +27,6 @@ const SearchScreen = () => {
                 setLoading(true);
                 let url = `${endpoints['dishes']}?page=${page}`;
                 
-                // Nối các query parameters động gửi lên Django
                 if (q) url = `${url}&q=${q}`;
                 if (chef) url = `${url}&chef_name=${chef}`;
                 if (maxPrice) url = `${url}&price_max=${maxPrice}`;
@@ -39,7 +36,7 @@ const SearchScreen = () => {
                 let res = await APIs.get(url);
                 
                 if (res.data.next === null) {
-                    setPage(0); // Hết trang tiếp theo
+                    setPage(0); 
                 }
 
                 if (page === 1) {
@@ -55,7 +52,6 @@ const SearchScreen = () => {
         }
     };
 
-    // Cơ chế tự động gọi API sau khi ngừng gõ 500ms
     useEffect(() => {
         let timer = setTimeout(() => {
             if (page > 0) loadSearchResults();
@@ -63,7 +59,6 @@ const SearchScreen = () => {
         return () => clearTimeout(timer);
     }, [q, chef, maxPrice, maxTime, ordering, page]);
 
-    // Trở về trang 1 bất cứ khi nào thay đổi tiêu chí bộ lọc
     useEffect(() => {
         setPage(1);
         setDishes([]);
@@ -75,7 +70,6 @@ const SearchScreen = () => {
         }
     };
 
-    // Hàm hiển thị nhãn Tiếng Việt cho kiểu sắp xếp hiện tại
     const getSortLabel = () => {
         if (ordering === 'name') return 'Tên món';
         if (ordering === 'price') return 'Giá tăng';
@@ -85,7 +79,6 @@ const SearchScreen = () => {
 
     return (
         <View style={Styles.container}>
-            {/* 1. THANH TÌM KIẾM GỐC */}
             <View style={Styles.searchRow}>
                 <TextInput 
                     style={Styles.nativeSearchbar}
@@ -103,7 +96,6 @@ const SearchScreen = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* 2. PANEL BỘ LỌC NÂNG CAO GỐC */}
             {showAdvanced && (
                 <View style={Styles.advancedPanel}>
                     <Text style={Styles.panelTitle}>Bộ lọc nâng cao </Text>
@@ -135,7 +127,6 @@ const SearchScreen = () => {
                 </View>
             )}
 
-            {/* 3. THANH CHỌN SẮP XẾP SẠCH SẼ (Thay thế Menu của Paper) */}
             <View style={Styles.sortBar}>
                 <Text style={Styles.resultCount}>Tìm thấy {dishes.length} món</Text>
                 <TouchableOpacity 
@@ -163,7 +154,6 @@ const SearchScreen = () => {
                 </View>
             )}
 
-            {/* 4. DANH SÁCH KẾT QUẢ */}
             <FlatList
                 data={dishes}
                 keyExtractor={item => item.id.toString()}
