@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState,useEffect,useCallback } from "react"
 import { Dimensions, ScrollView, StyleSheet, View } from "react-native"
-import { ActivityIndicator, Card, SegmentedButtons, Text } from "react-native-paper";
-import { COLORS } from "../../styles/Styles"
+import { ActivityIndicator, Appbar, Card, SegmentedButtons, Text } from "react-native-paper";
+import Styles, { COLORS } from "../../styles/Styles"
 import { authApis, endpoints } from "../../configs/APIs";
 import { BarChart, LineChart } from "react-native-chart-kit";
 import Style from "./Style";
@@ -44,7 +44,7 @@ const ChefStats = () => {
      useEffect(() => { loadStats(); }, [period]);
     const totalRevenue = revenueData.reduce((sum, d) => sum + (d.revenue || 0), 0);
     const totalDishes = dishStats.reduce((sum, d) => sum + (d.total_quantity || 0), 0);
-      const revenueChartData = {
+    const revenueChartData = {
         labels: revenueData.slice(-7).map(d => {
             const date = new Date(d.day);
             return `${date.getDate()}/${date.getMonth() + 1}`;
@@ -69,9 +69,11 @@ const ChefStats = () => {
         );
     }
     return(
-        <ScrollView style={Style.container}>
-            <Text style={Style.header} >📊 Thống kê kinh doanh</Text>
-            <View style={Style.summaryRow}>
+        <ScrollView style={Styles.container}>
+             <Appbar.Header style={{ backgroundColor: COLORS.primary, justifyContent: 'center' }}>
+                <Appbar.Content title="THỐNG KÊ KINH DOANH" titleStyle={{color: 'white', fontWeight: 'bold', textAlign: 'center' }} />
+            </Appbar.Header>
+            <View style={[Style.summaryRow, { marginTop: 20 }]}>
                 <Card style={Style.summaryCard}>
                     <Card.Content>
                         <Text style={Style.summaryLabel}>💰 Tổng doanh thu</Text>

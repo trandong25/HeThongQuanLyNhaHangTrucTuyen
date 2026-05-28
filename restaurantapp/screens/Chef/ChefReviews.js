@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-nativ
 import { Appbar, Card, Avatar, Divider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import APIs, { endpoints, authApis } from '../../configs/APIs';
-import { COLORS } from '../../styles/Styles';
+import Styles, { COLORS } from '../../styles/Styles';
 import Style from './Style';
 
 
@@ -32,34 +32,36 @@ const ChefReviews = ({ navigation }) => {
 
     const renderReviewItem = ({ item }) => {
         return (
-            <Card style={Style.card}>
-                <Card.Content>
-                    <View style={Style.headerRow}>
-                        <Avatar.Image 
-                            size={40} 
-                            source={{ uri: item.customer?.avatar || 'https://via.placeholder.com/150' }} 
-                        />
-                        <View style={{ marginLeft: 12, flex: 1 }}>
-                            <Text style={Style.customerName}>{item.customer?.username || 'Khách hàng'}</Text>
-                            <Text style={Style.ratingText}>Chấm điểm: ⭐ {item.rating}/5</Text>
-                        </View>
-                        <Text style={Style.dateText}>{new Date(item.created_date).toLocaleDateString('vi-VN')}</Text>
-                    </View>
+            <View stye= {Styles.container}>
+                <Card style={Style.card}>
+                    <Card.Content>
+                        <View style={Style.headerRow}>
+                            <Avatar.Image 
+                                    size={40} 
+                                    source={{ uri: item.customer?.avatar || 'https://via.placeholder.com/150' }} 
+                            />
+                            <View style={{ marginLeft: 12, flex: 1 }}>
+                                <Text style={Style.customerName}>{item.customer?.username || 'Khách hàng'}</Text>
+                                <Text style={Style.ratingText}>Chấm điểm: ⭐ {item.rating}/5</Text>
+                            </View>
+                                <Text style={Style.dateText}>{new Date(item.created_date).toLocaleDateString('vi-VN')}</Text>
+                            </View>
 
-                    <Divider style={{ marginVertical: 10 }} />
+                            <Divider style={{ marginVertical: 10 }} />
 
-                    <Text style={Style.dishTarget}>
-                        Áp dụng cho món: <Text style={{ fontWeight: 'bold', color: COLORS.primary }}>{item.dish_name}</Text>
-                    </Text>
+                            <Text style={Style.dishTarget}>
+                                Áp dụng cho món: <Text style={{ fontWeight: 'bold', color: COLORS.primary }}>{item.dish_name}</Text>
+                            </Text>
 
-                    <Text style={Style.commentContent}>"{item.comment}"</Text>
-                </Card.Content>
-            </Card>
+                            <Text style={Style.commentContent}>"{item.comment}"</Text>
+                        </Card.Content>
+                </Card>
+            </View>
         );
     };
 
     return (
-        <View style={Style.container}>
+        <View style={[Styles.container, { paddingBottom: 80 }]}>
             <Appbar.Header style={{ backgroundColor: COLORS.primary }}>
                 <Appbar.BackAction onPress={() => navigation.goBack()} />
                 <Appbar.Content title="Đánh giá của khách hàng" />

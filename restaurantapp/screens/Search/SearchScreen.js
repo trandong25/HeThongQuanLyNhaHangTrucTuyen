@@ -78,7 +78,7 @@ const SearchScreen = () => {
     };
 
     return (
-        <View style={Styles.container}>
+        <View style={Styles.cont}>
             <View style={Styles.searchRow}>
                 <TextInput 
                     style={Styles.nativeSearchbar}
@@ -146,7 +146,7 @@ const SearchScreen = () => {
                         <Text style={ordering === 'price' ? Styles.sortTextActive : Styles.sortText}>Giá: Thấp đến Cao</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={Styles.sortItem} onPress={() => { setOrdering('price'); setShowSortOptions(false); }}>
-                        <Text style={ordering === 'price' ? Styles.sortTextActive : Styles.sortText}>Giá: Cao đến Thấp</Text>
+                        <Text style={ordering === '-price' ? Styles.sortTextActive : Styles.sortText}>Giá: Cao đến Thấp</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={Styles.sortItem} onPress={() => { setOrdering('-rating'); setShowSortOptions(false); }}>
                         <Text style={ordering === '-rating' ? Styles.sortTextActive : Styles.sortText}>Theo Đánh giá</Text>

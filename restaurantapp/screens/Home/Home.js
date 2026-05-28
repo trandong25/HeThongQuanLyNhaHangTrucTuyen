@@ -114,7 +114,7 @@ const Home = () => {
                 onPress={() => nav.navigate('Search')}
                 style={Styles.padding}
             >
-                <View style={Styles.padding}>
+                <View style={Styles.padding, {marginTop: 30}}>
                     <Searchbar style={Styles.search} value={q} onChangeText={setQ} placeholder="Tìm món ăn..." />
                 </View> 
             </TouchableOpacity>

@@ -61,12 +61,7 @@ export default StyleSheet.create({
         marginTop: 40, 
         color: 'gray' 
     },
-    container: { 
-        flex: 1, 
-        backgroundColor: '#f5f5f5' 
-    },
-
-    center: { 
+    center: {
         flex: 1, 
         justifyContent: 'center', 
         alignItems: 'center' 
