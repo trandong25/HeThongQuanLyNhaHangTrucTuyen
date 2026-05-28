@@ -42,9 +42,8 @@ const ChefStats = () => {
         }
     }
      useEffect(() => { loadStats(); }, [period]);
-     const totalRevenue = dishStats.reduce((sum,d) => sum + (d.revenue || 0),0);
-     const totalOrders = dishStats.reduce((sum,d) => sum + (d.total_quantity || 0) ,0);
-
+    const totalRevenue = revenueData.reduce((sum, d) => sum + (d.revenue || 0), 0);
+    const totalDishes = dishStats.reduce((sum, d) => sum + (d.total_quantity || 0), 0);
       const revenueChartData = {
         labels: revenueData.slice(-7).map(d => {
             const date = new Date(d.day);
@@ -83,8 +82,8 @@ const ChefStats = () => {
                 </Card>
                 <Card style={styles.summaryCard}>
                     <Card.Content>
-                        <Text style={styles.summaryLabel}>🍽️ Tổng đơn</Text>
-                        <Text style={styles.summaryValue}>{totalOrders}</Text>
+                        <Text style={styles.summaryLabel}>🍳 Số món đã chế biến</Text>
+                        <Text style={styles.summaryValue}>{totalDishes} món</Text>
                     </Card.Content>
                 </Card>
             </View>
@@ -111,6 +110,13 @@ const ChefStats = () => {
                             chartConfig={chartConfig}
                             bezier
                             style={{ borderRadius: 12, marginTop: 8 }}
+                            fromZero={true}
+                            formatYLabel={(yValue) => {
+                                const y = parseInt(yValue);
+                                if (y >= 1000000) return (y / 1000000).toFixed(1) + 'M';
+                                if (y >= 1000) return (y / 1000).toFixed(0) + 'K';
+                                return y.toString();
+                            }}
                         />
                     ):(
                         <Text style={styles.empty}>Chưa có dữ liệu</Text>

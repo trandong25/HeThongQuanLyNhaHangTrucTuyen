@@ -1,22 +1,12 @@
-from django.db.models.fields import DateField
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.decorators import action
-from django.core.serializers import serialize
 from rest_framework import viewsets, generics, permissions,status, parsers,filters
 from .models import Category, Dish, User, Review, Reservation, Order, Transaction, OrderDetail, Ingredient
 from restaurant import serializers, paginators,perms
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.functions import TruncDay, TruncDate
-from oauthlib.uri_validate import query
 from rest_framework.permissions import IsAuthenticated
-from .serializers import CompareDishSerializer, ReviewSerializer, IngredientSerializer
-from django.db.models import  Sum, Avg, F
-from .serializers import DishSerializer
+from .serializers import CompareDishSerializer, ReviewSerializer, IngredientSerializer,DishSerializer
+from django.db.models import  Sum, Avg, F,DateField
 import requests
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,action
 from rest_framework.response import Response
 from django.conf import settings
 from django.utils import timezone
@@ -27,7 +17,6 @@ from django.db.models.functions import Cast
 class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = Category.objects.filter(active = True).order_by('-id')
     serializer_class = serializers.CategorySerializer
-
     permission_classes = [permissions.AllowAny]
 
 class DishViewSet(viewsets.ModelViewSet):
@@ -70,6 +59,7 @@ class DishViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(chef=self.request.user)
+
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [perms.IsApprovedChef()]

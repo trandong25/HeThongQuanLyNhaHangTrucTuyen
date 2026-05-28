@@ -18,7 +18,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class CompareDishSerializer(serializers.ModelSerializer):
     avg_rating = serializers.SerializerMethodField()
-    ingredients = serializers.SerializerMethodField()
     class Meta:
         model = Dish
         fields = ['id', 'name', 'price', 'category', 'prep_time', 'image', 'ingredients', 'avg_rating']
@@ -56,7 +55,7 @@ class UserSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
-            avatar=validated_data.get('avatar'),  # Ảnh đại diện của bạn
+            avatar=validated_data.get('avatar'),
             role=role,
             is_approved=is_approved
         )
@@ -73,10 +72,6 @@ class ReviewSerializer(serializers.ModelSerializer):
             'dish': {'write_only': True},
             'customer': {'read_only': True}
         }
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['customer'] = UserSerializer(instance.customer).data
-        return data
     def validate_rating(self, value):
         if value < 1 or value > 5:
             raise serializers.ValidationError("Rating must be between 1 and 5")
@@ -151,7 +146,7 @@ class OrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         details_data = validated_data.pop('order_details')
 
-        #request = self.context.get('request'), request.user
+
         user = self.context['request'].user
         order = Order.objects.create(customer=user, **validated_data)
 
