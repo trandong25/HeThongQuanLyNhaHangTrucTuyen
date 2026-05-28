@@ -40,13 +40,6 @@ const ChefHome = () => {
                     url += `&category_id=${selectedCate}`;
                 }
 
-                console.log("=== DEBUG API ===");
-                console.log("Token:", token ? "✓ Có token" : "✗ KHÔNG CÓ TOKEN");
-                console.log("Endpoint:", endpoints['dishes']);
-                console.log("URL gọi:", url);
-                console.log("Page:", page);
-                console.log("===============");
-
                 let res = await authApis(token).get(url); 
 
                 if (page === 1) {

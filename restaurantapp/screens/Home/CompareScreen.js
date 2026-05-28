@@ -86,8 +86,8 @@ const CompareScreen = () => {
             />
             <CompareRow
                 label="⭐ Đánh giá"
-                value1={dish1.rating || '4.9'}
-                value2={dish2.rating || '4.9'}
+                value1={dish1.avg_rating || '4.9'}
+                value2={dish2.avg_rating || '4.9'}
                 lowerIsBetter={false}
             />
             <CompareRow
