@@ -47,7 +47,9 @@ class DishViewSet(viewsets.ModelViewSet):
         if chef_name:
             queryset = queryset.filter(chef__username__icontains=chef_name)
         ordering = self.request.query_params.get('ordering')
-        if ordering in ['name','-name' ,'price','-price']:
+        if ordering == '-rating':
+            queryset = queryset.annotate(avg_rating=Avg('reviews__rating')).order_by('-avg_rating')
+        elif ordering in ['name', '-name', 'price', '-price']:
                 queryset=queryset.order_by(ordering)
 
         return queryset
