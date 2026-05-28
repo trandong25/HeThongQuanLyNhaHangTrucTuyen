@@ -115,7 +115,7 @@ const ChefStats = () => {
                             fromZero={true}
                             formatYLabel={(yValue) => {
                                 const y = parseInt(yValue);
-                                if (y >= 1000000) return (y / 1000000).toFixed(1) + 'M';
+                                if (y >= 1000000) return parseFloat((y / 1000000).toFixed(3)) + 'M';
                                 if (y >= 1000) return (y / 1000).toFixed(0) + 'K';
                                 return y.toString();
                             }}
