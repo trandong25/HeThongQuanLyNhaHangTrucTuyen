@@ -145,7 +145,7 @@ const SearchScreen = () => {
                     <TouchableOpacity style={Styles.sortItem} onPress={() => { setOrdering('price'); setShowSortOptions(false); }}>
                         <Text style={ordering === 'price' ? Styles.sortTextActive : Styles.sortText}>Giá: Thấp đến Cao</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={Styles.sortItem} onPress={() => { setOrdering('price'); setShowSortOptions(false); }}>
+                    <TouchableOpacity style={Styles.sortItem} onPress={() => { setOrdering('-price'); setShowSortOptions(false); }}>
                         <Text style={ordering === '-price' ? Styles.sortTextActive : Styles.sortText}>Giá: Cao đến Thấp</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={Styles.sortItem} onPress={() => { setOrdering('-rating'); setShowSortOptions(false); }}>
