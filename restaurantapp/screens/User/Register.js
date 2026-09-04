@@ -137,16 +137,22 @@ const Register = () => {
                 }
 
             } catch (ex) {
-                console.error(ex);
-                
-
                 if (ex.response) {
-                    console.log(" LỖI TỪ DJANGO:", ex.response.data);
-                    setErr("Username đã tồn tại!");
+                    const responseData = ex.response.data;
+                    const firstError =
+                        Object.values(responseData || {})[0];
+                    const message = Array.isArray(firstError)
+                        ? firstError[0]
+                        : firstError;
+
+                    setErr(
+                        typeof message === "string"
+                            ? message
+                            : "Thông tin đăng ký không hợp lệ."
+                    );
                 } else {
                     setErr("Không thể kết nối server!");
                 }
-
             } finally {
                 setLoading(false);
             }
@@ -242,21 +248,7 @@ const Register = () => {
             Đăng ký
         </Button>
 
-        <View style={Styles.divider}>
-            <View style={Styles.line} />
-            <Text style={Styles.dividerText}>hoặc tiếp tục với</Text>
-            <View style={Styles.line} />
-        </View>
 
-        <Button icon="google" mode="outlined" style={Styles.ggBtn}
-            contentStyle={{ height: 50 }}>
-            Đăng nhập bằng Google
-        </Button>
-
-        <Button icon="facebook" mode="contained" style={Styles.fbBtn}
-            contentStyle={{ height: 50 }}>
-            Đăng nhập bằng Facebook
-        </Button>
 
     </ScrollView>
 );

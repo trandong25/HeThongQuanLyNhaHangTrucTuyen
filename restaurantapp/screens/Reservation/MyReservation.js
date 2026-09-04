@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { Appbar, Button, Card, Chip, Divider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authApis, endpoints } from '../../configs/APIs';
 import { COLORS } from '../../styles/Styles';
+import { useFocusEffect } from "@react-navigation/native";
 
 const MyReservations = ({ navigation }) => {
     const [reservations, setReservations] = useState([]);
@@ -33,9 +34,11 @@ const MyReservations = ({ navigation }) => {
         }
     };
 
-    useEffect(() => {
-        fetchReservations();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetchReservations();
+        }, [])
+    );
 
     const getStatusUI = (status) => {
         switch (status) {
@@ -58,7 +61,9 @@ const MyReservations = ({ navigation }) => {
     }
         const relatedOrder = orders.find(o => o.reservation === item.id);
         const orderDetails = relatedOrder?.details ?? [];
-        const isDone = !!relatedOrder && orderDetails.length > 0;
+        const isDone =
+            relatedOrder?.status === "DONE" &&
+            orderDetails.length > 0;
         return (
             <Card style={styles.card}>
                 <Card.Content>
@@ -113,7 +118,7 @@ const MyReservations = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Appbar.Header>
-                <Appbar.BackAction onPress={() => navigation.navigate('MainTabs', { screen: 'Trang chủ' })} />
+                <Appbar.BackAction onPress={() => navigation.goBack()} />
                 <Appbar.Content title="Đặt bàn của tôi" titleStyle={{ fontWeight: 'bold' }} />
             </Appbar.Header>
             <FlatList

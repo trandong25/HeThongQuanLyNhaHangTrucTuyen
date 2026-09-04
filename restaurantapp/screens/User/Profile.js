@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MyUserContext } from "../../configs/Contexts";
 import { COLORS } from "../../styles/Styles"; 
+import { authApis, endpoints } from "../../configs/APIs";
 
 const Profile = () => {
     const nav = useNavigation();
@@ -16,9 +17,21 @@ const Profile = () => {
             { text: "Hủy", style: "cancel" },
             { 
                 text: "Đăng xuất", 
-                onPress: async () => {
-                    await AsyncStorage.removeItem("token");
-                    dispatchUser({ type: "LOGOUT" });
+               onPress: async () => {
+                    try {
+                        const refreshToken = await AsyncStorage.getItem("refreshToken");
+
+                        if (refreshToken) {
+                            await authApis().post(endpoints.logout, {
+                                refresh: refreshToken,
+                            });
+                        }
+                    } catch (ex) {
+                        console.error("Không thể thu hồi token:", ex.response?.data);
+                    } finally {
+                        await AsyncStorage.multiRemove(["token", "refreshToken"]);
+                        dispatchUser({ type: "LOGOUT" });
+                    }
                 },
                 style: "destructive"
             }
@@ -62,13 +75,6 @@ const Profile = () => {
                             onPress={() => nav.navigate("Order")}
                         />
                         <Divider />
-                        <List.Item
-                            title="Chat với nhà hàng"
-                            description="Hỗ trợ, tư vấn trực tiếp"
-                            left={props => <List.Icon {...props} icon="chat-processing-outline" color="#03A9F4" />}
-                            right={props => <List.Icon {...props} icon="chevron-right" />}
-                            onPress={() => nav.navigate("Chat")}
-                        />
                     </View>
                 </>
                 )}

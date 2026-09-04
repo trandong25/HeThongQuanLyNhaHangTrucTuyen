@@ -1,10 +1,10 @@
-export const MyUserReducer = (current, action) => {
+export const MyUserReducer = (currentState, action) => {
     switch (action.type) {
         case "LOGIN":
             return action.payload;
         case "LOGOUT":
             return null;
+        default:
+            return currentState;
     }
-
-    return current;
-}
+};

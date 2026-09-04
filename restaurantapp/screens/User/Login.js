@@ -4,7 +4,7 @@ import {Button,HelperText,TextInput} from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import Styles from "./Styles";
-import Apis, {authApis,endpoints} from "../../configs/APIs";
+import Apis, { endpoints } from "../../configs/APIs";
 import { MyUserContext } from "../../configs/Contexts";
 
 const Login = () => {
@@ -47,50 +47,55 @@ const Login = () => {
     };
 
     const login = async () => {
-        if (validate() === false) return;
+        if (!validate()) return;
 
         try {
             setLoading(true);
             setErr("");
 
-            let res = await Apis.post(endpoints["login-proxy"], {
-                username: user.username,
+            const response = await Apis.post(endpoints.login, {
+                username: user.username.trim(),
                 password: user.password,
-                grant_type: "password",
             });
 
-            const accessToken = res.data.access_token;
+            const loggedInUser = response.data.user;
 
-            let u = await authApis(accessToken).get(endpoints["current-user"]);
-            const loggedInUser = u.data;
+            await AsyncStorage.multiSet([
+                ["token", response.data.access],
+                ["refreshToken", response.data.refresh],
+            ]);
 
-            if (loggedInUser.role === 'CHEF' && !loggedInUser.is_approved) {
-                Alert.alert("Thông báo", "🔒 Tài khoản Đầu bếp đang chờ Admin phê duyệt!");
-                return; 
-            }
+            dispatch({
+                type: "LOGIN",
+                payload: loggedInUser,
+            });
 
-            await AsyncStorage.setItem("token", accessToken);
+            Alert.alert("Thành công", "Đăng nhập thành công!");
 
-            Alert.alert("Thành công", "🎉 Đăng nhập thành công!");
-            nav.navigate("Home");
+            const pending = await AsyncStorage.getItem("pendingPayment");
 
-            dispatch({ type: "LOGIN", payload: loggedInUser });
-             const pending = await AsyncStorage.getItem('pendingPayment');
-            if (pending) {
-                await AsyncStorage.removeItem('pendingPayment'); 
+            if (pending && loggedInUser.role !== "CHEF") {
+                await AsyncStorage.removeItem("pendingPayment");
                 const params = JSON.parse(pending);
-                nav.navigate('Reservation', {
-                    screen: 'Payment',
-                    params: params,
-                });
+
+                nav.navigate("Payment", params);
+
+                return;
             }
 
+            if (loggedInUser.role !== "CHEF") {
+                nav.navigate("Home");
+            }
         } catch (ex) {
-            console.error(ex.response?.data);
-            if (ex.response?.status === 400)
-                setErr("Sai tài khoản hoặc mật khẩu!");
-            else
+            const message = ex.response?.data?.detail || ex.response?.data?.error;
+
+            if (message?.includes("No active account")) {
+                setErr("Sai tên đăng nhập hoặc mật khẩu!");
+            } else if (message) {
+                setErr(message);
+            } else {
                 setErr("Không thể kết nối server!");
+            }
         } finally {
             setLoading(false);
         }
@@ -101,7 +106,7 @@ const Login = () => {
         contentContainerStyle={[Styles.scrollContent, Styles.center]}
         showsVerticalScrollIndicator={false}
     >
-        <Text style={Styles.title}>Chào mừng trở lại 👋</Text>
+        <Text style={Styles.title}>Chào mừng trở lại </Text>
         <Text style={Styles.subtitle}>Đăng nhập để khám phá hôm nay</Text>
         <View style={Styles.tabContainer}>
 
@@ -122,32 +127,6 @@ const Login = () => {
                     </Text>
                 </TouchableOpacity>
 
-            </View>
-
-            <Button
-                mode="contained"
-                icon="facebook"
-                style={Styles.fbBtn}
-            >
-                Tiếp tục với Facebook
-            </Button>
-
-            <Button
-                mode="outlined"
-                icon="google"
-                style={Styles.ggBtn}
-            >
-                Tiếp tục với Google
-            </Button>
-
-            <View style={Styles.divider}>
-                <View style={Styles.line} />
-
-                <Text style={Styles.dividerText}>
-                    hoặc dùng email
-                </Text>
-
-                <View style={Styles.line} />
             </View>
 
             {

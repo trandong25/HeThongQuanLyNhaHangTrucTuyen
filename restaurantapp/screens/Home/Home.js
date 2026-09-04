@@ -1,12 +1,17 @@
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState,useCallback } from "react"
-import { View,ScrollView,ActivityIndicator, TouchableOpacity, FlatList,Image } from "react-native";
-import APIs, { endpoints } from "../../configs/APIs.js";
-import { Chip, List, Searchbar, Text } from "react-native-paper";
-import Styles, { COLORS } from "../../styles/Styles";
+import { useEffect, useState } from "react";
+import {
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { Searchbar, Text } from "react-native-paper";
+import APIs, { endpoints } from "../../configs/APIs";
+import CategoryList from "../../components/CategoryList";
 import FoodCard from "../../components/FoodCard";
-import CategoryList from "../../components/CategoryList.js";
-import { Alert } from "react-native";
+import Styles, { COLORS } from "../../styles/Styles";
 
 
 const Home = () => {
@@ -14,7 +19,8 @@ const Home = () => {
     const [dishes, setDishes] = useState([]);
     const [selectedCate, setSelectedCate] = useState(null)
     const [loading, setLoading] = useState(false);
-    const [q,setQ] = useState("");
+    const [error, setError] = useState("");
+    const [hasNextPage, setHasNextPage] = useState(true);
     const [page,setPage] = useState(1)
     const [compareList,setCompareList] = useState([])
 
@@ -22,101 +28,110 @@ const Home = () => {
 
 
     const loadCate = async () => {
-        try{
-            setLoading(true)
-            let url = `${endpoints['categories']}`;
-            
-            let res = await APIs.get(url);
-            
-            setCategories(res.data.results);
-        }catch(ex){
-            console.error("LỖI TẢI DANH MỤC: ", ex); 
-        }finally {
+        try {
+            const response = await APIs.get(endpoints.categories);
+            setCategories(response.data.results || response.data || []);
+        } catch (ex) {
+            setError("Không thể tải danh mục. Vui lòng thử lại.");
+        }
+    };
+    const loadDishes = async () => {
+        if (!hasNextPage && page > 1) return;
+
+        try {
+            setLoading(true);
+            setError("");
+
+            const response = await APIs.get(endpoints.dishes, {
+                params: {
+                    page,
+                    category_id: selectedCate || undefined,
+                },
+            });
+
+            const results = response.data.results || response.data || [];
+
+            setDishes(previous =>
+                page === 1 ? results : [...previous, ...results]
+            );
+            setHasNextPage(Boolean(response.data.next));
+        } catch (ex) {
+            setError("Không thể tải món ăn. Vui lòng thử lại.");
+        } finally {
             setLoading(false);
         }
-    }
-    const loadDishes = async () => {
-        if (page>0){
-            try{
-                setLoading(true)
-                let url = `${endpoints['dishes']}?page=${page}`;
-                if (q){
-                    url = `${url}&q=${q}`;
-                }
-                if(selectedCate){
-                    url = `${url}&category_id=${selectedCate}`;
-                }
-
-                let res = await APIs.get(url);
-                
-                if (res.data.next === null) {
-                    setPage(0); 
-                }
-
-                if (page === 1) {
-                    setDishes(res.data.results || []);
-                } else {
-                    setDishes(prev => [...dishes, ...res.data.results]);
-                }
-            }catch(ex){
-                console.error(ex)  
-            } finally {
-                setLoading(false)
-            }
-        }
-    }
-    useEffect(() => {
+    };
+   useEffect(() => {
         loadCate();
-    }, [])
+    }, []);
 
-    useEffect(()=>{
-        let timer = setTimeout(() => {
-            if (page>0)
-                loadDishes();
-        },500);
-        return () => clearTimeout(timer)
-    },[q,selectedCate,page])
+    useEffect(() => {
+        const timer = setTimeout(loadDishes, 300);
+        return () => clearTimeout(timer);
+    }, [selectedCate, page]);
 
     useEffect(() => {
         setPage(1);
         setDishes([]);
-    }, [q, selectedCate]);
+        setHasNextPage(true);
+        setCompareList([]);
+    }, [selectedCate]);
 
     const loadMore = () => {
-        if (page > 0 && !loading && dishes.length > 0) {
-        setPage(page + 1);
+        if (hasNextPage && !loading && dishes.length > 0) {
+            setPage(previous => previous + 1);
         }
-    }
-    const handleCompare= (item) => {
-        setCompareList(prev =>{
-            if(prev.find(d => d.id === item.id)){
-                return prev.filter(d => d.id !== item.id)
+    };
+    const handleCompare = item => {
+        setCompareList(previous => {
+            if (previous.find(dish => dish.id === item.id)) {
+                return previous.filter(dish => dish.id !== item.id);
             }
-            if (prev.length=== 1){
-                if(prev[0].category !== item.category   ){
-                    Alert.alert("Không cùng doanh mục","Chỉ món ăn cùng doanh mục mới được so sánh!");
-                    return prev;
-                }
+
+            const previousCategory =
+                previous[0]?.category?.id ?? previous[0]?.category;
+            const itemCategory = item.category?.id ?? item.category;
+
+            if (
+                previous.length === 1 &&
+                previousCategory !== itemCategory
+            ) {
+                Alert.alert(
+                    "Khác danh mục",
+                    "Chỉ có thể so sánh hai món cùng danh mục."
+                );
+                return previous;
             }
-            if(prev.length>=2){
-                alert("Chỉ chọn được 2 món để so sánh");
-                return prev
+
+            if (previous.length >= 2) {
+                Alert.alert(
+                    "Thông báo",
+                    "Chỉ chọn được hai món để so sánh."
+                );
+                return previous;
             }
-            
-            return [...prev,item];
-        })
-    }
+
+            return [...previous, item];
+        });
+    };
 
     return (
         <View style={Styles.cont}>
-            <TouchableOpacity 
-                activeOpacity={0.9} 
-                onPress={() => nav.navigate('Search')}
+            <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() => nav.navigate("Search")}
                 style={Styles.padding}
             >
-                <View style={Styles.padding, {marginTop: 30}}>
-                    <Searchbar style={Styles.search} value={q} onChangeText={setQ} placeholder="Tìm món ăn..." />
-                </View> 
+                <View
+                    pointerEvents="none"
+                    style={[Styles.padding, { marginTop: 30 }]}
+                >
+                    <Searchbar
+                        style={Styles.search}
+                        value=""
+                        placeholder="Tìm món ăn..."
+                    />
+                </View>
             </TouchableOpacity>
            
             <CategoryList 
@@ -135,7 +150,10 @@ const Home = () => {
                                 dish2: compareList[1],
                             });
                         } else {
-                            alert("Vui lòng chọn thêm 1 món nữa để so sánh!");
+                            Alert.alert(
+                                "Thông báo",
+                                "Vui lòng chọn thêm một món nữa để so sánh."
+                            );
                         }
                     }}
                 >
@@ -156,7 +174,28 @@ const Home = () => {
                 contentContainerStyle={{ paddingBottom: 10 }}
                 onEndReached={loadMore}
                 onEndReachedThreshold={0.5}
-                ListFooterComponent={loading && <ActivityIndicator size="large" color="#E65100" style={Styles.margin} />}
+                ListEmptyComponent={
+                    !loading ? (
+                        <Text
+                            style={{
+                                color: COLORS.textSub,
+                                padding: 24,
+                                textAlign: "center",
+                            }}
+                        >
+                            {error || "Không có món ăn trong danh mục này."}
+                        </Text>
+                    ) : null
+                }
+                ListFooterComponent={
+                    loading ? (
+                        <ActivityIndicator
+                            size="large"
+                            color={COLORS.primary}
+                            style={Styles.margin}
+                        />
+                    ) : null
+                }
                 
                 renderItem={({item}) => (
                     <FoodCard 
@@ -173,6 +212,6 @@ const Home = () => {
      </View>
         
     );
-}
+};
 
 export default Home;

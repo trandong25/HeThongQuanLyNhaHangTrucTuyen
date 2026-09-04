@@ -14,11 +14,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-import ckeditor_uploader
 from django.contrib import admin
 from django.urls import path, re_path, include
 from drf_yasg.views import get_schema_view
-from restaurant import views
 from restaurant.admin import admin_site
 from rest_framework import permissions
 from drf_yasg import openapi
@@ -38,9 +36,6 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('', include('restaurant.urls')),
     path('admin/', admin_site.urls),
-    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    path('login-proxy/',views.login_proxy,name='login'),
-    re_path(r'^ckeditor/', include('ckeditor_uploader.urls')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$',
             schema_view.without_ui(cache_timeout=0),
             name='schema-json'),

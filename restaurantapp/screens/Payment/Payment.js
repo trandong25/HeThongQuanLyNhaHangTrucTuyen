@@ -118,25 +118,51 @@ const Payment = ({route}) => {
                                 endpoints['order-pay'](orderId),
                                 {payment_method:method}
                             );
-                            dispatchCart({type:"CLEAR_CART"})
-                            
+                           dispatchCart({ type: "CLEAR_CART" });
+
                             Alert.alert(
-                                "✅ Đặt hàng thành công!",
-                                `Mã đơn: #${orderId}\n${payRes.data.message}`,
-                                [{
-                                    text: "Xem đặt bàn & Đánh giá",
-                                    onPress: () => {
-                                        dispatchCart({ type: "CLEAR_CART" });
-                                        nav.navigate('MyReservations', { defaultTab: 'orders' });
-                                    }
-                                },
+                                "Đặt bàn thành công",
+                                `Mã đơn: #${orderId}\n${payRes.data.message || ""}`,
+                                [
+                                    {
+                                        text: "Xem lịch đặt bàn",
+                                        onPress: () => {
+                                            nav.reset({
+                                                index: 1,
+                                                routes: [
+                                                    {
+                                                        name: "MainTabs",
+                                                        params: {
+                                                            screen: "Home",
+                                                        },
+                                                    },
+                                                    {
+                                                        name: "MyReservations",
+                                                    },
+                                                ],
+                                            });
+                                        },
+                                    },
+                                    {
+                                        text: "Về trang chủ",
+                                        onPress: () => {
+                                            nav.reset({
+                                                index: 0,
+                                                routes: [
+                                                    {
+                                                        name: "MainTabs",
+                                                        params: {
+                                                            screen: "Home",
+                                                        },
+                                                    },
+                                                ],
+                                            });
+                                        },
+                                    },
+                                ],
                                 {
-                                    text: "Về trang chủ",
-                                    onPress: () => {
-                                        dispatchCart({ type: "CLEAR_CART" });
-                                        nav.navigate('MainTabs', { screen: 'Home' });
-                                    }
-                                }]
+                                    cancelable: false,
+                                }
                             );
 
                         } catch(error) {

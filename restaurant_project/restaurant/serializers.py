@@ -3,7 +3,8 @@ from .models import User,Category,Dish,Review,Ingredient,Transaction
 from .models import Table,Reservation, OrderDetail, Order
 from django.db.models import Avg
 from datetime import timedelta
-
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -62,6 +63,18 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+class LoginSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        if self.user.role == "CHEF" and not self.user.is_approved:
+            raise AuthenticationFailed(
+                "Tài khoản đầu bếp đang chờ quản trị viên phê duyệt."
+            )
+
+        data["user"] = UserSerializer(self.user).data
+        return data
 
 class ReviewSerializer(serializers.ModelSerializer):
     customer = UserSerializer(read_only=True)

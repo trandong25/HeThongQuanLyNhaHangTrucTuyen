@@ -1,20 +1,13 @@
 from django.contrib import admin
-from django.db.models import Count
 from django.template.response import TemplateResponse
 from django.urls import path
 from restaurant.models import Category, Dish, User, Ingredient, Order, Review, Table, Transaction, ChatSession, \
     OrderDetail, Reservation
-from django import forms
-from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django.utils.html import mark_safe
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.contrib import messages
 from django.db.models import Count, Sum
 
-class DishForm(forms.ModelForm):
-    def __init__(self,*args, **kwargs):
-        super().__init__(*args,**kwargs)
-        self.fields['description'].required = False
 
 class DishAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'price', 'category', 'chef','prep_time', 'active', 'image_preview']
@@ -23,7 +16,6 @@ class DishAdmin(admin.ModelAdmin):
     readonly_fields = ['image_preview']
     filter_horizontal = ('ingredients',)
 
-    # locj user role Chef
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "chef":
             kwargs["queryset"] = User.objects.filter(role='CHEF')

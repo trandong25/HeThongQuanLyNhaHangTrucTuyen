@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import Styles, { COLORS } from '../../styles/Styles'; 
+
 import { endpoints, authApis } from '../../configs/APIs';
 import APIs from '../../configs/APIs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from "@react-navigation/native";
+import {
+    useIsFocused,
+    useNavigation,
+} from "@react-navigation/native";
 import { Appbar, Divider, FAB } from 'react-native-paper';
 import CategoryList from '../../components/CategoryList';
 
@@ -18,6 +22,7 @@ const ChefHome = () => {
     const [page, setPage] = useState(1);
     
     const navigation = useNavigation();
+    const isFocused = useIsFocused();
 
     const loadCategories = async () => {
         try {
@@ -31,7 +36,8 @@ const ChefHome = () => {
     const loadDishes = async () => {
         if (page > 0) {
             try {
-                if (page === 1 && !refreshing) setLoading(true);
+                if (page === 1 && !refreshing)
+                    setLoading(true);
 
                 let token = await AsyncStorage.getItem("token");
                 let url = `${endpoints['dishes']}?page=${page}`;
@@ -68,18 +74,22 @@ const ChefHome = () => {
     }, [selectedCate]);
 
     useEffect(() => {
-        let timer = setTimeout(() => {
-            if (page > 0) loadDishes();
-        }, 500);
+        if (!isFocused) return;
+
+        const timer = setTimeout(() => {
+            if (page > 0) {
+                loadDishes();
+            }
+        }, 300);
+
         return () => clearTimeout(timer);
-    }, [page, selectedCate]);
+    }, [page, selectedCate, isFocused]);
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            setPage(1); 
-        });
-        return unsubscribe;
-    }, [navigation]);
+        if (isFocused) {
+            setPage(1);
+        }
+    }, [isFocused]);
 
    const handleRefresh = () => {
     setRefreshing(true);
@@ -106,9 +116,17 @@ const ChefHome = () => {
                     onPress: async () => {
                         try {
                             let token = await AsyncStorage.getItem("token");
-                            if(!token) return;
+                            if (!token)
+                                return;
                             await authApis(token).delete(`${endpoints['dishes']}${id}/`);
-                            Alert.alert("Thành công", "Đã xóa món ăn!");
+                            setDishes(current =>
+                                current.filter(dish => dish.id !== id)
+                            );
+
+                            Alert.alert(
+                                "Thành công",
+                                "Đã xóa món ăn."
+                            );
                             setPage(1); 
                         } catch (ex) {
                             Alert.alert("Lỗi", "Không thể xóa món này. Có thể món đang nằm trong đơn hàng.");

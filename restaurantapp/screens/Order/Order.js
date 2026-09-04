@@ -99,18 +99,6 @@ const Order = () => {
                         Tổng cộng: <Text style={{ color: COLORS.primary }}>{formatPrice(item.total_amount)}đ</Text>
                     </Text>
 
-                    {item.status === 'DONE' && (
-                        <Button
-                            mode="contained"
-                            buttonColor={COLORS.primary}
-                            onPress={() => nav.navigate('Review', {
-                                orderId: item.id,
-                                details: orderDetails
-                            })}
-                        >
-                            Đánh giá
-                        </Button>
-                    )}
                 </View>
             </Card.Content>
         </Card>

@@ -15,10 +15,13 @@ const CheckoutFooter = ({
     return (
         <View style={Style.container}>
             <TouchableOpacity
-                style={[Style.button, disabled && Style.buttonDisabled]}
+                style={[
+                    Style.button,
+                    (disabled || loading) && Style.buttonDisabled,
+                ]}
                 onPress={onPress}
                 activeOpacity={0.8}
-                disabled={disabled}
+                disabled={disabled || loading}
             >
                 <Text style={Style.text}>{buttonText}</Text>
                 

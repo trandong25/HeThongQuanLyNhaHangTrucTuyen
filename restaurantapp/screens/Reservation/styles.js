@@ -49,5 +49,10 @@ export default StyleSheet.create({
         marginBottom: 8,
         fontWeight: 'bold',
         color: '#333',
+    },
+    center: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: "center"
     }
 });
