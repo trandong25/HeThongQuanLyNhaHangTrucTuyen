@@ -10,23 +10,30 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 MEDIA_ROOT = '%s/restaurant/static/' % BASE_DIR
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-w8j(np-om^a!u@tg)vfq&fpw7zu#1beycp#u=z&lw#p9ig*(f2'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "unsafe-development-key")
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv(
+        "DJANGO_ALLOWED_HOSTS",
+        "127.0.0.1,localhost"
+    ).split(",")
+    if host.strip()
+]
 
 # Application definition
 
@@ -38,27 +45,35 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'restaurant.apps.RestaurantConfig',
-    'ckeditor',
-    'ckeditor_uploader',
     'rest_framework',
     'drf_yasg',
-    'oauth2_provider',
+    'rest_framework_simplejwt.token_blacklist',
     'django_filters',
 ]
 
-CKEDITOR_UPLOAD_PATH = "images/ckeditors/"
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 8,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter'
     ]
+}
+
+from datetime import timedelta
+
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 MIDDLEWARE = [
@@ -94,15 +109,24 @@ WSGI_APPLICATION = 'restaurant_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'restaurant_db',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': ''
+if os.getenv("DB_ENGINE", "sqlite").lower() == "mysql":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.getenv("DB_NAME", "restaurant_db"),
+            "USER": os.getenv("DB_USER", "root"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+            "PORT": os.getenv("DB_PORT", "3306"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -111,10 +135,13 @@ AUTH_USER_MODEL = 'restaurant.User'
 
 import cloudinary.api
 
+import cloudinary.api
+
 cloudinary.config(
-    cloud_name="dhao6ky98",
-    api_key="741292862314714",
-    api_secret="W2ZRuCS-79Rf5FY9H3cu5qUUDYQ"
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True
 )
 
 import pymysql
@@ -153,17 +180,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-
-OAUTH2_PROVIDER = {
-    "ALLOWED_GRANT_TYPES": ["password"],
-}
-CLIENT_ID = 'fUgCfLWbqR5edVtzCAmdLnzRIRDOyRuTXZgBsoFs'
-CLIENT_SECRET = '0GWzA6QwVapaEK7jtSnU5n8GGfeFKGjc5j7vhrb4ZRBdDwcCMukx9IRetqWroVc2l55jN8Tai0KhbnJ9qZoqCftxzb2LWSlNhwuKrhreyVf5RTcKZMCwbh82LFivO4wB'
-
-CLIENT_ID1 = 'sHnrLNJ7Lc6wCuuoWcn15olkR3ksJQOXEaM06G2E'
-CLIENT_SECRET1 = 'IfY1uZTK5SRRl4ARXiBt4E7HXeYKMjZp8GFMdjoL4l7jqYCZh63T8rSrx6izlrxYNpvDEIwo3Cl0g9B0rbDKUfUGTPckm0hfNqyIoS7mp28Ge8cue4p6Q0egMxuye22s'
 
 
 

@@ -9,16 +9,8 @@ const CategoryList = ({ categories, selectedCate, setSelectedCate }) => {
                 <View style={[Styles.row, Styles.wrap]}>
                     <TouchableOpacity onPress={() => setSelectedCate(null)}>
                         <Chip
-                            style={[
-                                Styles.margin,
-                                {
-                                    backgroundColor: !selectedCate ? COLORS.primary : '#E0E0E0',
-                                },
-                            ]}
-                            textStyle={{
-                                color: !selectedCate ? '#fff' : '#333',
-                                fontWeight: 'bold',
-                            }}
+                            style={[Styles.margin, {backgroundColor: !selectedCate ? COLORS.primary : '#E0E0E0',},]}
+                            textStyle={{color: !selectedCate ? '#fff' : '#333',fontWeight: 'bold',}}
                             icon="label"
                         >
                             Tất cả
@@ -28,12 +20,7 @@ const CategoryList = ({ categories, selectedCate, setSelectedCate }) => {
                     {categories.map(c => (
                         <TouchableOpacity key={c.id} onPress={() => setSelectedCate(c.id)}>
                             <Chip
-                                style={[
-                                    Styles.margin,
-                                    {
-                                        backgroundColor: c.id === selectedCate ? COLORS.primary : '#E0E0E0',
-                                    },
-                                ]}
+                                style={[Styles.margin,{backgroundColor: c.id === selectedCate ? COLORS.primary : '#E0E0E0',},]}
                                 textStyle={{
                                     color: c.id === selectedCate ? '#fff' : '#333',
                                     fontWeight: 'bold',

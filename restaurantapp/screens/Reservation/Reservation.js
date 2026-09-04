@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, Platform } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Platform, Alert } from "react-native";
 import Styles, { COLORS } from "../../styles/Styles";
 import { Appbar, Button, Card, Divider, IconButton, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
@@ -56,10 +56,30 @@ const Reservation = () => {
         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+07:00`;
     };
     const handleCheckOut = () => {
-        if (!date || !time || !guests) {
-            alert("Vui lòng chọn ngày, giờ và số lượng khách");
+        if (cartItems.length === 0) {
+            Alert.alert(
+                "Giỏ hàng trống",
+                "Vui lòng chọn ít nhất một món ăn."
+            );
             return;
         }
+
+        const reservationDateTime = combineDateTime(date, time);
+
+        if (new Date(reservationDateTime) <= new Date()) {
+            Alert.alert(
+                "Thời gian không hợp lệ",
+                "Vui lòng chọn thời gian đặt bàn trong tương lai."
+            );
+            return;
+        }
+
+        nav.navigate("Payment", {
+            reservation_time: reservationDateTime,
+            number_of_people: guests,
+            totalAmount: subTotal,
+            cartItems,
+        });
     };
 
     return (
@@ -125,33 +145,13 @@ const Reservation = () => {
                             <IconButton icon="plus" size={20} onPress={() => increaseGuests()} />
                         </View>
                 </View>
-                <View style={[styles.whiteBox, { marginBottom: 100 }]}>
-                    <Text style={styles.noteLabel}>
-                        Yêu cầu đặc biệt (Ghi chú):
-                    </Text>
-                    <TextInput
-                        mode="outlined"
-                        placeholder="Ví dụ: Ngồi gần cửa sổ, ăn chay..."
-                        multiline
-                        numberOfLines={3}
-                        style={{ backgroundColor: '#FFF' }}
-                    />
-                </View>
             </ScrollView>
             <CheckoutFooter
                 totalAmount={subTotal}
                 buttonText="Chọn thanh toán"
+                disabled={cartItems.length === 0}
                 loading={false}
-                onPress={() => {
-                    const reservationDateTime = combineDateTime(date, time);
-
-                    nav.navigate("Payment", {
-                    reservation_time: reservationDateTime,
-                    number_of_people: guests,
-                    totalAmount: subTotal,
-                    cartItems: cartItems,
-                    });
-                }}
+                onPress={handleCheckOut}
             />
         </View>
     );

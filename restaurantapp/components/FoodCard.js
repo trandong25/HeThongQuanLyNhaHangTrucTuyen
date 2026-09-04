@@ -8,13 +8,15 @@ import Style from "./Style"
 
 
 
- export const formatPrice = (price) => {
-        if (!price) return '0';
-        return parseFloat(price).toLocaleString('vi-VN'); 
-    }
+export const formatPrice = price => {
+    const value = Number(price);
+    return Number.isFinite(value)
+        ? value.toLocaleString("vi-VN")
+        : "0";
+};
 
 const FoodCard = ({item, onPress,onComparePress,isComparing}) => {
-    const [cart, dispatchCart] = useContext(CartContext);
+    const [, dispatchCart] = useContext(CartContext);
     const [user, ] = useContext(MyUserContext);
     const navigation = useNavigation();
 
@@ -51,22 +53,25 @@ const FoodCard = ({item, onPress,onComparePress,isComparing}) => {
                         source={{ uri: item.image }}
                         style={Style.foodImage}
                     />
-                    <View style={Style.hotBadge}>
-                        <Text style={Style.hotBadgeText}>HOT</Text>
-                    </View>
-                    <TouchableOpacity 
-                        onPress={onComparePress} 
-                        style={[
-                            Style.btnCompare,
-                            isComparing ? { backgroundColor: '#E65100' } : {}
-                        ]}
-                    >
-                    <Icon 
-                        source={isComparing ? "check" : "scale-balance"} 
-                        size={18} 
-                        color={isComparing ? "#fff" : "#E65100"} 
-                    />
-                </TouchableOpacity>
+                    {onComparePress && (
+                        <TouchableOpacity
+                            accessibilityLabel="Chọn món để so sánh"
+                            onPress={event => {
+                                event.stopPropagation();
+                                onComparePress();
+                            }}
+                            style={[
+                                Style.btnCompare,
+                                isComparing ? { backgroundColor: "#E65100" } : {},
+                            ]}
+                        >
+                            <Icon
+                                source={isComparing ? "check" : "scale-balance"}
+                                size={18}
+                                color={isComparing ? "#fff" : "#E65100"}
+                            />
+                        </TouchableOpacity>
+                    )}
 
                 </View>
 
@@ -100,7 +105,14 @@ const FoodCard = ({item, onPress,onComparePress,isComparing}) => {
                             {formatPrice(item.price)}đ
                         </Text>
 
-                        <TouchableOpacity onPress={handleAddToCart} style={Styles.btnAddCart}>
+                        <TouchableOpacity
+                            accessibilityLabel={`Thêm ${item.name} vào giỏ hàng`}
+                            onPress={event => {
+                                event.stopPropagation();
+                                handleAddToCart();
+                            }}
+                            style={Styles.btnAddCart}
+                        >
                             <Icon source="plus" size={20} color="white" />
                         </TouchableOpacity>
                     </View>

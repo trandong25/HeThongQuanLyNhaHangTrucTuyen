@@ -5,14 +5,16 @@ from restaurant import serializers, paginators,perms
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CompareDishSerializer, ReviewSerializer, IngredientSerializer,DishSerializer
 from django.db.models import  Sum, Avg, F,DateField
-import requests
-from rest_framework.decorators import api_view,action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models.functions import Cast
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework_simplejwt.views import TokenObtainPairView
 
+class LoginView(TokenObtainPairView):
+    serializer_class = serializers.LoginSerializer
 
 class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
     queryset = Category.objects.filter(active = True).order_by('-id')
@@ -109,7 +111,6 @@ class DishViewSet(viewsets.ModelViewSet):
             ).first()
 
             if existing_review:
-                # Cập nhật review cũ
                 s = serializers.ReviewSerializer(
                     existing_review,
                     data={
@@ -185,7 +186,6 @@ class ReviewViewSet(viewsets.ViewSet,generics.DestroyAPIView, generics.UpdateAPI
     serializer_class = serializers.ReviewSerializer
 
     def get_permissions(self):
-        # Chỉ owner mới được sửa/xóa review của mình
         if self.action in ['update', 'partial_update', 'destroy']:
             return [perms.IsReviewOwner()]
         return [permissions.IsAuthenticatedOrReadOnly()]
@@ -311,25 +311,23 @@ class TransactionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def logout(request):
+    refresh_token = request.data.get("refresh")
 
+    if not refresh_token:
+        return Response(
+            {"error": "Refresh token là bắt buộc."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
+    try:
+        RefreshToken(refresh_token).blacklist()
+    except TokenError:
+        return Response(
+            {"error": "Refresh token không hợp lệ hoặc đã hết hạn."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
-@api_view(['POST'])
-def login_proxy(request):
-
-    username = request.data.get("username")
-    password = request.data.get("password")
-    token_url=request.build_absolute_uri("/o/token/")
-
-    payload = {
-        "username": username,
-        "password": password,
-        "client_id": settings.CLIENT_ID,
-        "client_secret": settings.CLIENT_SECRET,
-        "grant_type": "password"
-    }
-    res = requests.post(token_url, data=payload)
-
-    return Response(res.json(), status=res.status_code)
-
-
+    return Response(status=status.HTTP_204_NO_CONTENT)

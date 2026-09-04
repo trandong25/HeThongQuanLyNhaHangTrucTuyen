@@ -11,7 +11,8 @@ const SearchScreen = () => {
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const nav = useNavigation();
-
+    const [hasNextPage, setHasNextPage] = useState(true);
+    const [error, setError] = useState("");
     const [q, setQ] = useState("");
     const [chef, setChef] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
@@ -22,33 +23,33 @@ const SearchScreen = () => {
     const [showSortOptions, setShowSortOptions] = useState(false);
 
     const loadSearchResults = async () => {
-        if (page > 0) {
-            try {
-                setLoading(true);
-                let url = `${endpoints['dishes']}?page=${page}`;
-                
-                if (q) url = `${url}&q=${q}`;
-                if (chef) url = `${url}&chef_name=${chef}`;
-                if (maxPrice) url = `${url}&price_max=${maxPrice}`;
-                if (maxTime) url = `${url}&prep_time_max=${maxTime}`;
-                if (ordering) url = `${url}&ordering=${ordering}`;
+        if (!hasNextPage && page > 1) return;
 
-                let res = await APIs.get(url);
-                
-                if (res.data.next === null) {
-                    setPage(0); 
-                }
+        try {
+            setLoading(true);
+            setError("");
 
-                if (page === 1) {
-                    setDishes(res.data.results || []);
-                } else {
-                    setDishes(prev => [...prev, ...res.data.results]);
-                }
-            } catch (ex) {
-                console.error("LỖI TÌM KIẾM: ", ex);
-            } finally {
-                setLoading(false);
-            }
+            const response = await APIs.get(endpoints.dishes, {
+                params: {
+                    page,
+                    q: q || undefined,
+                    chef_name: chef || undefined,
+                    price_max: maxPrice || undefined,
+                    prep_time_max: maxTime || undefined,
+                    ordering,
+                },
+            });
+
+            const results = response.data.results || response.data || [];
+
+            setDishes(previous =>
+                page === 1 ? results : [...previous, ...results]
+            );
+            setHasNextPage(Boolean(response.data.next));
+        } catch (ex) {
+            setError("Không thể tải kết quả tìm kiếm.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -62,11 +63,12 @@ const SearchScreen = () => {
     useEffect(() => {
         setPage(1);
         setDishes([]);
+        setHasNextPage(true);
     }, [q, chef, maxPrice, maxTime, ordering]);
 
     const loadMore = () => {
-        if (page > 0 && !loading && dishes.length > 0) {
-            setPage(page + 1);
+        if (hasNextPage && !loading && dishes.length > 0) {
+            setPage(previous => previous + 1);
         }
     };
 
@@ -161,7 +163,13 @@ const SearchScreen = () => {
                 contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 8 }}
                 onEndReached={loadMore}
                 onEndReachedThreshold={0.4}
-                ListEmptyComponent={!loading && <Text style={Styles.emptyText}>Không tìm thấy món ăn phù hợp!</Text>}
+                ListEmptyComponent={
+                    !loading ? (
+                        <Text style={Styles.emptyText}>
+                            {error || "Không tìm thấy món ăn phù hợp!"}
+                        </Text>
+                    ) : null
+                }
                 ListFooterComponent={loading && <ActivityIndicator size="small" color="#E65100" style={{ marginVertical: 10 }} />}
                 renderItem={({item}) => (
                     <FoodCard 

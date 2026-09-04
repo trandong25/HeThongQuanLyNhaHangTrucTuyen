@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import Styles from "../../styles/Styles";
-import { CartContext } from "../../configs/Contexts";
+import { CartContext, MyUserContext } from "../../configs/Contexts";
 import { Alert, Image, ScrollView, View, StyleSheet } from "react-native";
 import { Button, Divider, Text } from "react-native-paper";
 import { formatPrice } from "../../components/FoodCard";
@@ -10,13 +10,40 @@ const CompareScreen = () => {
     const route = useRoute();
     const { dish1, dish2 } = route.params;
     const [, dispatchCart] = useContext(CartContext);
+    const [user] = useContext(MyUserContext);
+    const navigation = useNavigation();
 
-    const handleAddToCart = (item) => {
+    const handleAddToCart = item => {
+        if (!user) {
+            Alert.alert(
+                "Yêu cầu đăng nhập",
+                "Bạn cần đăng nhập để đặt món.",
+                [
+                    {
+                        text: "Để sau",
+                        style: "cancel",
+                    },
+                    {
+                        text: "Đăng nhập",
+                        onPress: () =>
+                            navigation.navigate("MainTabs", {
+                                screen: "Tài khoản",
+                            }),
+                    },
+                ]
+            );
+            return;
+        }
+
         dispatchCart({
-            type: 'ADD_TO_CART',
-            payload: item
+            type: "ADD_TO_CART",
+            payload: item,
         });
-        Alert.alert("Thành công", `Đã thêm ${item.name} vào giỏ hàng`);
+
+        Alert.alert(
+            "Thành công",
+            `Đã thêm ${item.name} vào giỏ hàng.`
+        );
     };
 
     const compare = (val1, val2, lowerIsBetter = false) => {
@@ -73,7 +100,7 @@ const CompareScreen = () => {
             </View>
 
             <CompareRow
-                label="💰 Giá"
+                label=" Giá"
                 value1={`${formatPrice(dish1.price)}đ`}
                 value2={`${formatPrice(dish2.price)}đ`}
                 lowerIsBetter={true}
@@ -85,43 +112,43 @@ const CompareScreen = () => {
                 lowerIsBetter={true}
             />
             <CompareRow
-                label="⭐ Đánh giá"
+                label=" Đánh giá"
                 value1={dish1.avg_rating || '4.9'}
                 value2={dish2.avg_rating || '4.9'}
                 lowerIsBetter={false}
             />
             <CompareRow
-                label="🧑‍🍳 Đầu bếp"
+                label=" Đầu bếp"
                 value1={dish1.chef?.first_name || 'N/A'}
                 value2={dish2.chef?.first_name || 'N/A'}
             />
             <CompareRow
-                label="🥬 Nguyên liệu"
+                label=" Nguyên liệu"
                 value1={dish1.ingredients?.map(i => i.name).join(', ') || 'N/A'}
                 value2={dish2.ingredients?.map(i => i.name).join(', ') || 'N/A'}
             />
-            <View style={[Styles.actionRow, Styles.actionRow]}>
+            <View style={[Styles.actionRow]}>
                 <View style={Styles.btnWrapper}>
                     <Button 
                         style={Styles.btn} 
-                        lStyle={Styles.btnText}
+                        labelStyle={Styles.btnText}
                         mode="contained" 
                         buttonColor="orange" 
                         onPress={() => handleAddToCart(dish1)}
                     >
-                        🛒 {dish1.name}
+                         {dish1.name}
                     </Button>
                 </View>
                 
                 <View style={Styles.btnWrapper}>
                     <Button 
                         style={Styles.btn} 
-                        Style={Styles.btnText}
+                        labelStyle={Styles.btnText}
                         mode="contained" 
                         buttonColor="orange" 
                         onPress={() => handleAddToCart(dish2)}
                     >
-                        🛒 {dish2.name}
+                         {dish2.name}
                     </Button>
                 </View>
             </View>
